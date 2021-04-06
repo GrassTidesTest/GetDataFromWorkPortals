@@ -284,7 +284,7 @@ public class JobsPage {
             // if the position's link and current url match, page was NOT redirected
             if (driver.getCurrentUrl().equals(linkAddress)) {
                 // get the detailed information from the page
-                getDetailedInformation(positionName);
+                getDetailedInformation(positionName, timestamp, linkAddress, homeOfficeValue);
             } else {
                 // otherwise save basic info to the excel
                 System.out.println("Basic info: " + positionName);
