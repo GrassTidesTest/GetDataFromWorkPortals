@@ -10,6 +10,6 @@ public class ZZZ_playground extends TestBase {
     public void playground() {
         ZZZ_playgroundPage zzz_playgroundPage = new ZZZ_playgroundPage();
 
-        zzz_playgroundPage.testTabs();
+        zzz_playgroundPage.stringManipulation();
     }
 }

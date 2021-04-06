@@ -2,6 +2,7 @@ package pages;
 
 import base.WebDriverSingleton;
 import helpers.ExcelEditor;
+import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -21,6 +22,7 @@ public class JobsPage {
     private static final String WEBSITE_NAME = "jobs.cz";
     private static final String SHEETNAME = "COLLECTED_DATA";
 
+    // Search form constants
     private static final String ISIT_KONZULTACE = "IS/IT: Konzultace, analýzy a projektové řízení";
     private static final String ISIT_SPRAVA = "IS/IT: Správa systémů a HW";
     private static final String ISIT_VYVOJ = "IS/IT: Vývoj aplikací a systémů";
@@ -29,13 +31,27 @@ public class JobsPage {
     private static final String NEXT_PAGE_BUTTON_XPATH = "//ul[contains(@class,'pager')]/li[a[contains(@class,'pager__next')]]";
     private static final String SALARY_LABEL_XPATH = "//*[contains(@class,'label--success')]";
     private static final String HOMEOFFICE_LABEL_XPATH = "//*[contains(@class,'search-list__home-office--label')]";
+
+    // Page with positions constants
     private static final String TIMESTAMP_PATTERN = "dd.MM.yyyy HH:mm";
     private static final String POSITION_NAME_XPATH = "//h3[contains(@class,'title')]";
     private static final String POSITION_COMPANY_XPATH = "//div[contains(@class,'company')]";
     private static final String POSITION_LINK_XPATH = "//h3/a";
 
+    // Position detail page constants
     private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
+    private static final String EDUCATION_TEXT = "Požadované vzdělání:";
+    private static final String LANGUAGES_TEXT = "Požadované jazyky: ";
+    private static final String SALARY_TEXT = "Plat: ";
+    private static final String BENEFITS_TEXT = "Benefity: ";
+    private static final String WORK_TAGS_TEXT = "Zařazeno: ";
+    private static final String TYPE_OF_EMPLOYMENT_TEXT = "Typ pracovního poměru: ";
+    private static final String LENGTH_OF_EMPLOYMENT_TEXT = "Délka pracovního poměru: ";
+    private static final String TYPE_OF_CONTRACT_TEXT = "Typ smluvního vztahu: ";
+    private static final String AUTHORITY_TEXT = "Zadavatel: ";
 
+
+    // Number of pages to check constant
     private static final int NUMBER_OF_PAGES_TO_CHECK = 1;
 
     // Search form
@@ -85,12 +101,12 @@ public class JobsPage {
     @FindBy(xpath = "//ul[contains(@class,'pager')]/li[a[contains(@class,'pager__prev')]]")
     private WebElement previousPageButton;
 
-    // Detail position page
+    // Position detail page
     @FindBy(xpath = DETAIL_INFO_XPATH)
     private WebElement detailInfoElement;
 
 
-    // functions for setting up the search
+    // methods for setting up the search
     public JobsPage() {
         driver = WebDriverSingleton.getInstance().getDriver();
         PageFactory.initElements(driver, this);
@@ -345,15 +361,18 @@ public class JobsPage {
     private void getDetailedInformation(String positionName) {
         System.out.println("Detail info: " + positionName);
 
-        if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
-            WebElement detailInfoSection = detailInfoElement;
+        // wait for the page to load
+        waitForVisibilityOfElement(driver, 5, detailInfoElement);
 
-            //here's a problem
-            int size = detailInfoSection.findElements(By.xpath("." + "/dd[span]")).size();
+        if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
+
+            // get size of the list with detailed information
+            int size = detailInfoElement.findElements(By.xpath("." + "/dd[span]")).size();
 
             // create empty string variables for the detailed information
             String company = "";
             String address = "";
+
             String education = "";
             String languages = "";
             String salary = "";
@@ -364,12 +383,35 @@ public class JobsPage {
             String typeOfContract = "";
             String authority = "";
 
+            // save
+
+//            DETAIL_INFO_XPATH;
+//            EDUCATION_TEXT;
+//            LANGUAGES_TEXT;
+//            SALARY_TEXT;
+//            BENEFITS_TEXT;
+//            WORK_TAGS_TEXT;
+//            TYPE_OF_EMPLOYMENT_TEXT;
+//            LENGTH_OF_EMPLOYMENT_TEXT;
+//            TYPE_OF_CONTRACT_TEXT;
+//            AUTHORITY_TEXT;
+
+
             System.out.println(size);
-        }
-        else {
+        } else {
             System.out.println("nah");
         }
 
+    }
+
+    private String getParentText(String infoName) {
+        String fullText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd[span[text()='Požadované vzdělání: ']]")).getText();
+
+        String childText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd/span[text()='Požadované vzdělání: ']")).getText();
+
+        String parentText = fullText.substring(fullText.indexOf(":") + 2);
+
+        return parentText;
     }
 
     // Calling ExcelEditor to write data to the excel file

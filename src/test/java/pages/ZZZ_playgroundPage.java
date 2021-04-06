@@ -17,43 +17,18 @@ public class ZZZ_playgroundPage {
         PageFactory.initElements(driver, this);
     }
 
-    public void testTabs() {
-        driver.get("https://www.jobs.cz/");
+    public void stringManipulation() {
+        driver.get("https://www.jobs.cz/rpd/1556336089/");
         new WebDriverWait(driver, 5);
-        assertJobsTitle();
 
-        // considering that there is only one tab opened in that point.
-        String newLink = "https://seznam.cz";
+        String fullText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd[span[text()='Požadované vzdělání: ']]")).getText();
 
-        // open new tab
-        ((JavascriptExecutor) driver).executeScript("window.open()");
-        System.out.println(driver.getWindowHandles());
-        ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
+        String childText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd/span[text()='Požadované vzdělání: ']")).getText();
 
-        // change focus to new windows
-        driver.switchTo().window(tabs.get(1));
+        String parentText = fullText.substring(fullText.indexOf(":") + 2);
 
-        // open new link
-        driver.get(newLink);
-        assertSeznamTitle();
-
-        // Do what you want here, you are in the new tab
-
-        // close the tab
-        driver.close();
-
-        // change back to main windows
-        driver.switchTo().window(tabs.get(0));
-        assertJobsTitle();
-
-        // Do what you want here, you are in the old tab
-    }
-
-    private void assertJobsTitle() {
-        assertEquals("Jobs.cz – Inspirujeme k úspěchu – nabídka práce, volná pracovní místa, brigády i vzdělávání a rozvoj", driver.getTitle().trim());
-    }
-
-    private void assertSeznamTitle() {
-        assertEquals("Seznam – najdu tam, co neznám", driver.getTitle().trim());
+        System.out.println(fullText);
+        System.out.println(childText);
+        System.out.println(parentText);
     }
 }
