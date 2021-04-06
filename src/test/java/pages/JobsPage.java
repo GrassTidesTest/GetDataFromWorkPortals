@@ -196,6 +196,7 @@ public class JobsPage {
 
     public void savePositionsToExcel() throws IOException {
         // go through set amount of pages that contain positions
+        // first run = first page containing list of positions, etc.
         for (int i = 0; i < NUMBER_OF_PAGES_TO_CHECK; i++) {
             // wait for the page to load
             waitForVisibilityOfElement(driver, 5, contentWrapper);
@@ -204,7 +205,7 @@ public class JobsPage {
             int positions_size = contentWrapper.findElements(By.xpath(POSITIONS_XPATH)).size();
 
             // send positions size to the function
-            // this function is the real thing
+            // go through the list of positions and save them to excel
             savePositionsToExcel(positions_size);
 
             // if the code reaches the last page or the set limit, break the cycle
@@ -233,16 +234,19 @@ public class JobsPage {
 
     private void savePositionsToExcel(int positions_size) throws IOException {
 
-        // go from first to last position
+        // go through the list of positions and for each position, determine if the basic info or detail info will be
+        // saved to the excel
         for (int i = 1; i < positions_size + 1; i++) {
 
             // wait for the page to load
             waitForVisibilityOfElement(driver, 5, contentWrapper);
 
-            // use i in xpath to determine which position to work with
+            // get webElement of the current position
+            // use i in xpath to determine which position from the list to work with
+            // i = 1, means it's the first position from the list etc.
             WebElement position = driver.findElement(By.xpath(POSITIONS_XPATH + "[" + i + "]"));
 
-            // define desired information
+            // get basic information for the position and save it to corresponding variables
             String timestamp = getTimeStamp(TIMESTAMP_PATTERN);
             String positionName = getElementText(position, POSITION_NAME_XPATH);
             String company = getElementText(position, POSITION_COMPANY_XPATH);
@@ -275,9 +279,13 @@ public class JobsPage {
     }
 
     private String getLabelValue(WebElement parentElement, String xpath) {
+        // define empty string
         String value = "";
 
+        // if the element exists
         if (parentElement.findElements(By.xpath("." + xpath)).size() > 0) {
+
+            // save it's value to the string
             value = parentElement.findElement(By.xpath("." + xpath)).getText().trim();
         }
 
@@ -285,15 +293,17 @@ public class JobsPage {
     }
 
     private String getElementText(WebElement parentElement, String xpath) {
+        // return text of the element based on the parentElement and xpath as a string
         return parentElement.findElement(By.xpath("." + xpath)).getText();
     }
 
     private String getTimeStamp(String pattern) {
+        // return time stamp based on a pattern as a string
         return new SimpleDateFormat(pattern).format(new java.util.Date());
     }
 
     private void openLinkInTab(String positionLink, ArrayList<String> tabs) {
-        // change focus to new windows
+        // change focus to new window
         driver.switchTo().window(tabs.get(1));
 
         // open new link
@@ -313,6 +323,7 @@ public class JobsPage {
         String originalString = parentElement.findElement(By.xpath("." + xpath)).getAttribute("href");
 
         // crop the link so that the part after ? including is not present
+        // link must contain ? otherwise it fails
         return originalString.substring(0, originalString.indexOf("?"));
     }
 
