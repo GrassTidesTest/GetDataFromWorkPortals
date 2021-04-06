@@ -1,6 +1,7 @@
 package pages;
 
 import base.WebDriverSingleton;
+import enumerators.Language;
 import helpers.ExcelEditor;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
@@ -426,6 +427,16 @@ public class JobsPage {
         }
 
         return "";
+    }
+
+    private Language determineLanguage() {
+        Language positionLanguage = Language.CZECH;
+
+        if (false) {
+            positionLanguage = Language.ENGLISH;
+        }
+
+        return positionLanguage;
     }
 
     // Calling ExcelEditor to write data to the excel file
