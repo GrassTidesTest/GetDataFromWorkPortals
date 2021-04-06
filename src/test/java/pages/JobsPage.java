@@ -353,6 +353,7 @@ public class JobsPage {
 
             // create empty string variables for the detailed information
             String company = "";
+            String address = "";
             String education = "";
             String languages = "";
             String salary = "";
