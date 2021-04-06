@@ -46,10 +46,10 @@ public class JobsPage {
     private static final String SALARY_TEXT_CZ = "Plat: ";
     private static final String BENEFITS_TEXT_CZ = "Benefity: ";
     private static final String WORK_TAGS_TEXT_CZ = "Zařazeno: ";
-    private static final String TYPE_OF_EMPLOYMENT_TEXT_CZ = "Typ pracovního poměru: ";
-    private static final String LENGTH_OF_EMPLOYMENT_TEXT_CZ = "Délka pracovního poměru: ";
+    private static final String EMPLOYMENT_FORM_TEXT_CZ = "Typ pracovního poměru: ";
+    private static final String CONTRACT_DURATION_TEXT_CZ = "Délka pracovního poměru: ";
     private static final String TYPE_OF_CONTRACT_TEXT_CZ = "Typ smluvního vztahu: ";
-    private static final String AUTHORITY_TEXT_CZ = "Zadavatel: ";
+    private static final String EMPLOYER_TEXT_CZ = "Zadavatel: ";
 
     // In English
     private static final String EDUCATION_TEXT_EN = "Required education: ";
@@ -57,10 +57,10 @@ public class JobsPage {
     private static final String SALARY_TEXT_EN = "Salary: ";
     private static final String BENEFITS_TEXT_EN = "Benefits: ";
     private static final String WORK_TAGS_TEXT_EN = "Listed in: ";
-    private static final String TYPE_OF_EMPLOYMENT_TEXT_EN = "Employment form: ";
-    private static final String LENGTH_OF_EMPLOYMENT_TEXT_EN = "Contract duration: ";
+    private static final String EMPLOYMENT_FORM_TEXT_EN = "Employment form: ";
+    private static final String CONTRACT_DURATION_TEXT_EN = "Contract duration: ";
     private static final String TYPE_OF_CONTRACT_TEXT_EN = "Employment contract: ";
-    private static final String AUTHORITY_TEXT_EN = "Employer type: ";
+    private static final String EMPLOYER_TEXT_EN = "Employer type: ";
 
 
     // Number of pages to check constant
@@ -389,10 +389,10 @@ public class JobsPage {
             String salary = getInformationText(SALARY_TEXT_CZ);
             String benefits = getInformationText(BENEFITS_TEXT_CZ);
             String workTags = getInformationText(WORK_TAGS_TEXT_CZ);
-            String typeOfEmployment = getInformationText(TYPE_OF_EMPLOYMENT_TEXT_CZ);
-            String lengthOfEmployment = getInformationText(LENGTH_OF_EMPLOYMENT_TEXT_CZ);
+            String typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
+            String lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_CZ);
             String typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
-            String authority = getInformationText(AUTHORITY_TEXT_CZ);
+            String authority = getInformationText(EMPLOYER_TEXT_CZ);
 
             System.out.println("-------------------- DETAIL INFORMATION PRINTOUT --------------------");
             System.out.println("Vzdelani: " + education);
