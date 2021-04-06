@@ -2,7 +2,6 @@ package pages;
 
 import base.WebDriverSingleton;
 import helpers.ExcelEditor;
-import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -373,37 +372,54 @@ public class JobsPage {
             String company = "";
             String address = "";
 
-            String education = "";
-            String languages = "";
-            String salary = "";
-            String benefits = "";
-            String workTags = "";
-            String typeOfEmployment = "";
-            String lengthOfEmployment = "";
-            String typeOfContract = "";
-            String authority = "";
+//            String education = "";
+//            String languages = "";
+//            String salary = "";
+//            String benefits = "";
+//            String workTags = "";
+//            String typeOfEmployment = "";
+//            String lengthOfEmployment = "";
+//            String typeOfContract = "";
+//            String authority = "";
 
-            education = getParentText(EDUCATION_TEXT);
-            languages = getParentText(LANGUAGES_TEXT);
-            salary = getParentText(SALARY_TEXT);
-            benefits = getParentText(BENEFITS_TEXT);
-            workTags = getParentText(WORK_TAGS_TEXT);
-            typeOfEmployment = getParentText(TYPE_OF_EMPLOYMENT_TEXT);
-            lengthOfEmployment = getParentText(LENGTH_OF_EMPLOYMENT_TEXT);
-            typeOfContract = getParentText(TYPE_OF_CONTRACT_TEXT);
-            authority = getParentText(AUTHORITY_TEXT);
+            String education = getInformationText(EDUCATION_TEXT);
+            String languages = getInformationText(LANGUAGES_TEXT);
+            String salary = getInformationText(SALARY_TEXT);
+            String benefits = getInformationText(BENEFITS_TEXT);
+            String workTags = getInformationText(WORK_TAGS_TEXT);
+            String typeOfEmployment = getInformationText(TYPE_OF_EMPLOYMENT_TEXT);
+            String lengthOfEmployment = getInformationText(LENGTH_OF_EMPLOYMENT_TEXT);
+            String typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT);
+            String authority = getInformationText(AUTHORITY_TEXT);
 
-            System.out.println(size);
+            System.out.println("-------------------- DETAIL INFORMATION PRINTOUT --------------------");
+            System.out.println("Vzdelani: " + education);
+            System.out.println("Jazyky: " + languages);
+            System.out.println("Plat: " + salary);
+            System.out.println("Benefity: " + benefits);
+            System.out.println("Tagy: " + workTags);
+            System.out.println("Typ uvazku: " + typeOfEmployment);
+            System.out.println("Delka uvazku: " + lengthOfEmployment);
+            System.out.println("Typ smlouvy: " + typeOfContract);
+            System.out.println("Zadavatel: " + authority);
+
         } else {
             System.out.println("nah");
         }
 
     }
 
-    private String getParentText(String infoName) {
-        String fullText = detailInfoElement.findElement(By.xpath("." + "/dd[span[text()='" + infoName + "']]")).getText();
+    private String getInformationText(String informationName) {
+        String xpath = "." + "/dd[span[text()='" + informationName + "']]";
 
-        return fullText.substring(fullText.indexOf(":") + 2);
+        if (driver.findElements(By.xpath(xpath)).size() > 0) {
+
+            String fullText = detailInfoElement.findElement(By.xpath(xpath)).getText();
+
+            return fullText.substring(fullText.indexOf(":") + 2);
+        }
+
+        return "";
     }
 
     // Calling ExcelEditor to write data to the excel file
