@@ -285,7 +285,6 @@ public class JobsPage {
             if (driver.getCurrentUrl().equals(linkAddress)) {
                 // get the detailed information from the page
                 getDetailedInformation(positionName);
-                ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "YES");
             } else {
                 // otherwise save basic info to the excel
                 System.out.println("Basic info: " + positionName);
@@ -357,7 +356,7 @@ public class JobsPage {
         System.out.println(workFromHome);
     }
 
-    private void getDetailedInformation(String positionName) {
+    private void getDetailedInformation(String positionName, String timestamp, String link, String homeOfficeValue) throws IOException {
         System.out.println("Detail info: " + positionName);
 
         // wait for the page to load
@@ -371,16 +370,6 @@ public class JobsPage {
             // create empty string variables for the detailed information
             String company = "";
             String address = "";
-
-//            String education = "";
-//            String languages = "";
-//            String salary = "";
-//            String benefits = "";
-//            String workTags = "";
-//            String typeOfEmployment = "";
-//            String lengthOfEmployment = "";
-//            String typeOfContract = "";
-//            String authority = "";
 
             String education = getInformationText(EDUCATION_TEXT);
             String languages = getInformationText(LANGUAGES_TEXT);
@@ -402,6 +391,8 @@ public class JobsPage {
             System.out.println("Delka uvazku: " + lengthOfEmployment);
             System.out.println("Typ smlouvy: " + typeOfContract);
             System.out.println("Zadavatel: " + authority);
+
+            ExcelWriter(timestamp, positionName, company, link, salary, homeOfficeValue, "YES");
 
         } else {
             System.out.println("nah");
