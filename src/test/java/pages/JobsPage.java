@@ -265,7 +265,7 @@ public class JobsPage {
             // if the position's link and current url match, page was NOT redirected
             if (driver.getCurrentUrl().equals(linkAddress)) {
                 // get the detailed information from the page
-                doStuffOnPositionDetailPage(positionName);
+                getDetailedInformation(positionName);
                 ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "YES");
             } else {
                 // otherwise save basic info to the excel
@@ -338,7 +338,7 @@ public class JobsPage {
         System.out.println(workFromHome);
     }
 
-    private void doStuffOnPositionDetailPage(String positionName) {
+    private void getDetailedInformation(String positionName) {
         System.out.println("Detail info: " + positionName);
 
 //        if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
