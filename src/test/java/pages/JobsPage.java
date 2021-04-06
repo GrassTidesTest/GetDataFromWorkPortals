@@ -34,7 +34,7 @@ public class JobsPage {
     private static final String POSITION_COMPANY_XPATH = "//div[contains(@class,'company')]";
     private static final String POSITION_LINK_XPATH = "//h3/a";
 
-    private static final String DETAIL_INFO_XPATH = "//dl";
+    private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
 
     private static final int NUMBER_OF_PAGES_TO_CHECK = 1;
 
@@ -84,6 +84,10 @@ public class JobsPage {
 
     @FindBy(xpath = "//ul[contains(@class,'pager')]/li[a[contains(@class,'pager__prev')]]")
     private WebElement previousPageButton;
+
+    // Detail position page
+    @FindBy(xpath = DETAIL_INFO_XPATH)
+    private WebElement detailInfoElement;
 
 
     // functions for setting up the search
@@ -342,7 +346,7 @@ public class JobsPage {
         System.out.println("Detail info: " + positionName);
 
         if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
-            WebElement detailInfoSection = driver.findElement(By.xpath(DETAIL_INFO_XPATH));
+            WebElement detailInfoSection = detailInfoElement;
 
             //here's a problem
             int size = detailInfoSection.findElements(By.xpath("." + "/dd[span]")).size();
