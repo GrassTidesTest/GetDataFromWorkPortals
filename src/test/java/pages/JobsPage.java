@@ -39,7 +39,7 @@ public class JobsPage {
 
     // Position detail page constants
     private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
-    private static final String EDUCATION_TEXT = "Požadované vzdělání:";
+    private static final String EDUCATION_TEXT = "Požadované vzdělání: ";
     private static final String LANGUAGES_TEXT = "Požadované jazyky: ";
     private static final String SALARY_TEXT = "Plat: ";
     private static final String BENEFITS_TEXT = "Benefity: ";
@@ -412,7 +412,7 @@ public class JobsPage {
     private String getInformationText(String informationName) {
         String xpath = "." + "/dd[span[text()='" + informationName + "']]";
 
-        if (driver.findElements(By.xpath(xpath)).size() > 0) {
+        if (detailInfoElement.findElements(By.xpath(xpath)).size() > 0) {
 
             String fullText = detailInfoElement.findElement(By.xpath(xpath)).getText();
 
