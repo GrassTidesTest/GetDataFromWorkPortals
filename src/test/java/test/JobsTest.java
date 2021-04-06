@@ -9,7 +9,7 @@ import java.io.IOException;
 public class JobsTest extends TestBase {
 
     @Test
-    public void openPageTest() throws InterruptedException, IOException {
+    public void extractPositionsFromThePage() throws InterruptedException, IOException {
         JobsPage jobsPage = new JobsPage();
 
         jobsPage.openPage();

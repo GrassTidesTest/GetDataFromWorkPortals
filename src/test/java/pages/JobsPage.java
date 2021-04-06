@@ -36,7 +36,7 @@ public class JobsPage {
 
     private static final String DETAIL_INFO_XPATH = "//dl";
 
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 5;
 
     // Search form
     @FindBy(xpath = "//div[@class='search-inputs']/div[1]//input")
@@ -200,35 +200,40 @@ public class JobsPage {
             // wait for the page to load
             waitForVisibilityOfElement(driver, 5, contentWrapper);
 
-            // create list of position elements on the page
-//            List<WebElement> positions = contentWrapper.findElements(By.xpath(POSITIONS_XPATH));
+            // get amount of positions on the page
             int positions_size = contentWrapper.findElements(By.xpath(POSITIONS_XPATH)).size();
 
             // send positions size to the function
             // this function is the real thing
-            iterateThroughListOfPositionsAndSaveToExcel(positions_size);
+            savePositionsToExcel(positions_size);
 
-            if (returnFalseIfNoForwardArrowOrLimitReached(i)) break;
+            // if the code reaches the last page or the set limit, break the cycle
+            if (getBreakCondition(i)) break;
         }
     }
 
-    private boolean returnFalseIfNoForwardArrowOrLimitReached(int i) {
+    private boolean getBreakCondition(int i) {
         boolean isForwardButtonPresent;
+
         // check if the forward button is present
         isForwardButtonPresent = driver.findElements(By.xpath(NEXT_PAGE_BUTTON_XPATH)).size() > 0;
 
-        // if yes then click it, if no then true
+        // if the button is present
         if (isForwardButtonPresent && i < NUMBER_OF_PAGES_TO_CHECK - 1) {
+            // then click the button
             nextPageButton.click();
         } else {
+            // otherwise return true and break the cycle
             return true;
         }
+
+        // return false so that the cycle can repeat
         return false;
     }
 
-    private void iterateThroughListOfPositionsAndSaveToExcel(int positions_size) throws IOException {
+    private void savePositionsToExcel(int positions_size) throws IOException {
 
-        // go from first position to last position
+        // go from first to last position
         for (int i = 1; i < positions_size + 1; i++) {
 
             // wait for the page to load
@@ -249,21 +254,22 @@ public class JobsPage {
             ((JavascriptExecutor) driver).executeScript("window.open()");
             ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
 
-            // open link in new tab
+            // open the current position in new tab
+            // by doing this we avoid getting stuck by some aggressive popup
             openLinkInTab(linkAddress, tabs);
 
-            // if the link and current address match, page was NOT redirected
-            // else the page was redirected
+            // if the position's link and current url match, page was NOT redirected
             if (driver.getCurrentUrl().equals(linkAddress)) {
+                // get the detailed information from the page
                 doStuffOnPositionDetailPage(positionName);
                 ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "YES");
             } else {
-                // write basic info only
+                // otherwise save basic info to the excel
                 System.out.println("Basic info: " + positionName);
                 ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "NO");
             }
 
-            //close the tab and focus back on the position list page
+            //close the current tab with the position and focus back on the position list page
             closeTabWithPosition(tabs);
         }
     }
