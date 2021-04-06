@@ -36,7 +36,7 @@ public class JobsPage {
 
     private static final String DETAIL_INFO_XPATH = "//dl";
 
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 5;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 1;
 
     // Search form
     @FindBy(xpath = "//div[@class='search-inputs']/div[1]//input")
@@ -206,7 +206,7 @@ public class JobsPage {
 
             // send positions size to the function
             // go through the list of positions and save them to excel
-            savePositionsToExcel(positions_size);
+            getPositionsAndSaveThemToExcel(positions_size);
 
             // if the code reaches the last page or the set limit, break the cycle
             if (getBreakCondition(i)) break;
@@ -232,7 +232,7 @@ public class JobsPage {
         return false;
     }
 
-    private void savePositionsToExcel(int positions_size) throws IOException {
+    private void getPositionsAndSaveThemToExcel(int positions_size) throws IOException {
 
         // go through the list of positions and for each position, determine if the basic info or detail info will be
         // saved to the excel
@@ -341,17 +341,17 @@ public class JobsPage {
     private void getDetailedInformation(String positionName) {
         System.out.println("Detail info: " + positionName);
 
-//        if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
-//            WebElement detailInfoSection = driver.findElement(By.xpath(DETAIL_INFO_XPATH));
-//
-//            //heres a problem
-//            int size = detailInfoSection.findElements(By.xpath("." + "/dd[span]")).size();
-//
-//            System.out.println(size);
-//        }
-//        else {
-//            System.out.println("nah");
-//        }
+        if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
+            WebElement detailInfoSection = driver.findElement(By.xpath(DETAIL_INFO_XPATH));
+
+            //here's a problem
+            int size = detailInfoSection.findElements(By.xpath("." + "/dd[span]")).size();
+
+            System.out.println(size);
+        }
+        else {
+            System.out.println("nah");
+        }
 
     }
 
