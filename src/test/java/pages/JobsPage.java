@@ -351,6 +351,18 @@ public class JobsPage {
             //here's a problem
             int size = detailInfoSection.findElements(By.xpath("." + "/dd[span]")).size();
 
+            // create empty string variables for the detailed information
+            String company = "";
+            String education = "";
+            String languages = "";
+            String salary = "";
+            String benefits = "";
+            String workTags = "";
+            String typeOfEmployment = "";
+            String lengthOfEmployment = "";
+            String typeOfContract = "";
+            String authority = "";
+
             System.out.println(size);
         }
         else {
