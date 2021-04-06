@@ -392,7 +392,9 @@ public class JobsPage {
             System.out.println("Typ smlouvy: " + typeOfContract);
             System.out.println("Zadavatel: " + authority);
 
-            ExcelWriter(timestamp, positionName, company, link, salary, homeOfficeValue, "YES");
+            ExcelWriter(timestamp, positionName, company, link, salary, homeOfficeValue,
+                    "YES", education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+                    typeOfContract, authority);
 
         } else {
             System.out.println("nah");
@@ -415,10 +417,29 @@ public class JobsPage {
 
     // Calling ExcelEditor to write data to the excel file
     private void ExcelWriter(String timestamp, String positionName, String company,
-                             String link, String salary, String workFromHome, String detail) throws IOException {
+                             String link, String salary, String workFromHome, String isDetail) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
-        String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome, detail};
+        String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
+                isDetail};
+
+        //Create an object of current class
+        ExcelEditor objExcelFile = new ExcelEditor();
+
+        //Write the file using file name, sheet name and the data to be filled
+        objExcelFile.WriteToExcel(System.getProperty("user.dir") + "\\src\\test\\resources",
+                base.TestBase.FILE_NAME, JobsPage.SHEETNAME, valueToWrite);
+    }
+
+    private void ExcelWriter(String timestamp, String positionName, String company, String link, String salary,
+                             String workFromHome, String isDetail, String education, String languages,
+                             String detailSalary, String benefits, String workTags, String typeOfEmployment,
+                             String lengthOfEmployment, String typeOfContract, String authority) throws IOException {
+
+        //Create an array with the data in the same order in which you expect to be filled in excel file
+        String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
+                isDetail, education, languages, detailSalary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+                typeOfContract, authority};
 
         //Create an object of current class
         ExcelEditor objExcelFile = new ExcelEditor();
