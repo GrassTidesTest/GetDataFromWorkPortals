@@ -383,17 +383,15 @@ public class JobsPage {
             String typeOfContract = "";
             String authority = "";
 
-            // save
-//            DETAIL_INFO_XPATH;
-//            EDUCATION_TEXT;
-//            LANGUAGES_TEXT;
-//            SALARY_TEXT;
-//            BENEFITS_TEXT;
-//            WORK_TAGS_TEXT;
-//            TYPE_OF_EMPLOYMENT_TEXT;
-//            LENGTH_OF_EMPLOYMENT_TEXT;
-//            TYPE_OF_CONTRACT_TEXT;
-//            AUTHORITY_TEXT;
+            education = getParentText(EDUCATION_TEXT);
+            languages = getParentText(LANGUAGES_TEXT);
+            salary = getParentText(SALARY_TEXT);
+            benefits = getParentText(BENEFITS_TEXT);
+            workTags = getParentText(WORK_TAGS_TEXT);
+            typeOfEmployment = getParentText(TYPE_OF_EMPLOYMENT_TEXT);
+            lengthOfEmployment = getParentText(LENGTH_OF_EMPLOYMENT_TEXT);
+            typeOfContract = getParentText(TYPE_OF_CONTRACT_TEXT);
+            authority = getParentText(AUTHORITY_TEXT);
 
             System.out.println(size);
         } else {
@@ -403,7 +401,7 @@ public class JobsPage {
     }
 
     private String getParentText(String infoName) {
-        String fullText = detailInfoElement.findElement(By.xpath("." + "/dd[span[text()='"+ infoName+"']]")).getText();
+        String fullText = detailInfoElement.findElement(By.xpath("." + "/dd[span[text()='" + infoName + "']]")).getText();
 
         return fullText.substring(fullText.indexOf(":") + 2);
     }
