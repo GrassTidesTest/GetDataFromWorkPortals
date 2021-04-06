@@ -22,13 +22,9 @@ public class ZZZ_playgroundPage {
         new WebDriverWait(driver, 5);
 
         String fullText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd[span[text()='Požadované vzdělání: ']]")).getText();
-
-        String childText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd/span[text()='Požadované vzdělání: ']")).getText();
-
         String parentText = fullText.substring(fullText.indexOf(":") + 2);
 
         System.out.println(fullText);
-        System.out.println(childText);
         System.out.println(parentText);
     }
 }

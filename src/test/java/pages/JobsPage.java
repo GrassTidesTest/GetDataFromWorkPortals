@@ -384,7 +384,6 @@ public class JobsPage {
             String authority = "";
 
             // save
-
 //            DETAIL_INFO_XPATH;
 //            EDUCATION_TEXT;
 //            LANGUAGES_TEXT;
@@ -396,7 +395,6 @@ public class JobsPage {
 //            TYPE_OF_CONTRACT_TEXT;
 //            AUTHORITY_TEXT;
 
-
             System.out.println(size);
         } else {
             System.out.println("nah");
@@ -405,13 +403,9 @@ public class JobsPage {
     }
 
     private String getParentText(String infoName) {
-        String fullText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd[span[text()='Požadované vzdělání: ']]")).getText();
+        String fullText = detailInfoElement.findElement(By.xpath("." + "/dd[span[text()='"+ infoName+"']]")).getText();
 
-        String childText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd/span[text()='Požadované vzdělání: ']")).getText();
-
-        String parentText = fullText.substring(fullText.indexOf(":") + 2);
-
-        return parentText;
+        return fullText.substring(fullText.indexOf(":") + 2);
     }
 
     // Calling ExcelEditor to write data to the excel file
