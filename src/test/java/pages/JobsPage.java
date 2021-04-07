@@ -378,9 +378,6 @@ public class JobsPage {
 
         if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
 
-            // get size of the list with detailed information
-            int size = detailInfoElement.findElements(By.xpath("." + "/dd[span]")).size();
-
             // create empty string variables for the detailed information
             String company = "";
             String address = "";
