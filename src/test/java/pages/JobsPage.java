@@ -427,18 +427,21 @@ public class JobsPage {
         return fullText;
     }
 
-    private boolean doesElementExist(String xpath){
+    private boolean doesElementExist(String xpath) {
         return driver.findElements(By.xpath(xpath)).size() > 0;
     }
 
-    private Language determineLanguage() {
-        Language positionLanguage = Language.CZECH;
+    private String determineLanguage(String xpath) {
 
-        if (false) {
-            positionLanguage = Language.ENGLISH;
+        String elementText = driver.findElement(By.xpath(xpath)).getText();
+
+        if (elementText.contains(CONTRACT_DURATION_TEXT_CZ)) {
+            return "CZECH";
+        } else if (elementText.contains(CONTRACT_DURATION_TEXT_EN)) {
+            return "ENGLISH";
         }
 
-        return positionLanguage;
+        return "UNKNOWN";
     }
 
     // Calling ExcelEditor to write data to the excel file
