@@ -395,16 +395,16 @@ public class JobsPage {
             String typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
             String authority = getInformationText(EMPLOYER_TEXT_CZ);
 
-            System.out.println("-------------------- DETAIL INFORMATION PRINTOUT --------------------");
-            System.out.println("Vzdelani: " + education);
-            System.out.println("Jazyky: " + languages);
-            System.out.println("Plat: " + salary);
-            System.out.println("Benefity: " + benefits);
-            System.out.println("Tagy: " + workTags);
-            System.out.println("Typ uvazku: " + typeOfEmployment);
-            System.out.println("Delka uvazku: " + lengthOfEmployment);
-            System.out.println("Typ smlouvy: " + typeOfContract);
-            System.out.println("Zadavatel: " + authority);
+//            System.out.println("-------------------- DETAIL INFORMATION PRINTOUT --------------------");
+//            System.out.println("Vzdelani: " + education);
+//            System.out.println("Jazyky: " + languages);
+//            System.out.println("Plat: " + salary);
+//            System.out.println("Benefity: " + benefits);
+//            System.out.println("Tagy: " + workTags);
+//            System.out.println("Typ uvazku: " + typeOfEmployment);
+//            System.out.println("Delka uvazku: " + lengthOfEmployment);
+//            System.out.println("Typ smlouvy: " + typeOfContract);
+//            System.out.println("Zadavatel: " + authority);
 
             ExcelWriter(timestamp, positionName, company, link, salary, homeOfficeValue,
                     "YES", education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
