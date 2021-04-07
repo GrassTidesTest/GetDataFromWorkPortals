@@ -376,7 +376,7 @@ public class JobsPage {
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, detailInfoElement);
 
-        if (driver.findElements(By.xpath(DETAIL_INFO_XPATH)).size() > 0) {
+        if (doesElementExists(DETAIL_INFO_XPATH)) {
 
             // create empty string variables for the detailed information
             String company = "";
@@ -425,6 +425,10 @@ public class JobsPage {
         }
 
         return fullText;
+    }
+
+    private boolean doesElementExists(String xpath){
+        return driver.findElements(By.xpath(xpath)).size() > 0;
     }
 
     private Language determineLanguage() {
