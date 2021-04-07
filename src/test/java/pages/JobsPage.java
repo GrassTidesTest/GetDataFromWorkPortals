@@ -415,15 +415,16 @@ public class JobsPage {
 
     private String getInformationText(String informationName) {
         String xpath = "." + "/dd[span[text()='" + informationName + "']]";
+        String fullText = "";
 
         if (detailInfoElement.findElements(By.xpath(xpath)).size() > 0) {
 
-            String fullText = detailInfoElement.findElement(By.xpath(xpath)).getText();
+            fullText = detailInfoElement.findElement(By.xpath(xpath)).getText();
 
             return fullText.substring(fullText.indexOf(":") + 2);
         }
 
-        return "";
+        return fullText;
     }
 
     private Language determineLanguage() {
