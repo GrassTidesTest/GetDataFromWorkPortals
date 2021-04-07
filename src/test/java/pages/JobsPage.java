@@ -63,6 +63,9 @@ public class JobsPage {
     private static final String TYPE_OF_CONTRACT_TEXT_EN = "Employment contract: ";
     private static final String EMPLOYER_TEXT_EN = "Employer type: ";
 
+    // In unknown language
+    private static final String UNKNOWN_LANGUAGE = "Neznámý jazyk";
+
 
     // Number of pages to check constant
     private static final int NUMBER_OF_PAGES_TO_CHECK = 1;
@@ -372,25 +375,61 @@ public class JobsPage {
 
     private void getDetailedInformation(String positionName, String timestamp, String link, String homeOfficeValue) throws IOException {
         System.out.println("Detail info: " + positionName);
+        // create empty string variables for the detailed information
+        String company = "";
+        String address = "";
+        String education = "";
+        String languages = "";
+        String salary = "";
+        String benefits = "";
+        String workTags = "";
+        String typeOfEmployment = "";
+        String lengthOfEmployment = "";
+        String typeOfContract = "";
+        String authority = "";
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, detailInfoElement);
 
         if (doesElementExist(DETAIL_INFO_XPATH)) {
 
-            // create empty string variables for the detailed information
-            String company = "";
-            String address = "";
+            switch (determineLanguage(DETAIL_INFO_XPATH)) {
+                case "CZECH":
+                    education = getInformationText(EDUCATION_TEXT_CZ);
+                    languages = getInformationText(LANGUAGES_TEXT_CZ);
+                    salary = getInformationText(SALARY_TEXT_CZ);
+                    benefits = getInformationText(BENEFITS_TEXT_CZ);
+                    workTags = getInformationText(WORK_TAGS_TEXT_CZ);
+                    typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
+                    lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_CZ);
+                    typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
+                    authority = getInformationText(EMPLOYER_TEXT_CZ);
+                    break;
 
-            String education = getInformationText(EDUCATION_TEXT_CZ);
-            String languages = getInformationText(LANGUAGES_TEXT_CZ);
-            String salary = getInformationText(SALARY_TEXT_CZ);
-            String benefits = getInformationText(BENEFITS_TEXT_CZ);
-            String workTags = getInformationText(WORK_TAGS_TEXT_CZ);
-            String typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
-            String lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_CZ);
-            String typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
-            String authority = getInformationText(EMPLOYER_TEXT_CZ);
+                case "ENGLISH":
+                    education = getInformationText(EDUCATION_TEXT_EN);
+                    languages = getInformationText(LANGUAGES_TEXT_EN);
+                    salary = getInformationText(SALARY_TEXT_EN);
+                    benefits = getInformationText(BENEFITS_TEXT_EN);
+                    workTags = getInformationText(WORK_TAGS_TEXT_EN);
+                    typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_EN);
+                    lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_EN);
+                    typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_EN);
+                    authority = getInformationText(EMPLOYER_TEXT_EN);
+                    break;
+
+                case "UNKNOWN":
+                    education = UNKNOWN_LANGUAGE;
+                    languages = UNKNOWN_LANGUAGE;
+                    salary = UNKNOWN_LANGUAGE;
+                    benefits = UNKNOWN_LANGUAGE;
+                    workTags = UNKNOWN_LANGUAGE;
+                    typeOfEmployment = UNKNOWN_LANGUAGE;
+                    lengthOfEmployment = UNKNOWN_LANGUAGE;
+                    typeOfContract = UNKNOWN_LANGUAGE;
+                    authority = UNKNOWN_LANGUAGE;
+                    break;
+            }
 
 //            System.out.println("-------------------- DETAIL INFORMATION PRINTOUT --------------------");
 //            System.out.println("Vzdelani: " + education);
