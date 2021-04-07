@@ -68,7 +68,7 @@ public class JobsPage {
 
 
     // Number of pages to check constant
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 1;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
 
     // Search form
     @FindBy(xpath = "//div[@class='search-inputs']/div[1]//input")
@@ -270,8 +270,8 @@ public class JobsPage {
 
     private void getPositionsAndSaveThemToExcel(int positions_size) throws IOException {
 
-        // go through the list of positions and for each position, determine if the basic info or detail info will be
-        // saved to the excel
+        // go through the list of positions and for each position determine
+        // if the basic info or detail info will be saved to the excel
         for (int i = 1; i < positions_size + 1; i++) {
 
             // wait for the page to load
@@ -301,7 +301,7 @@ public class JobsPage {
             // if the position's link and current url match, page was NOT redirected
             if (driver.getCurrentUrl().equals(linkAddress)) {
                 // get the detailed information from the page
-                getDetailedInformation(positionName, timestamp, linkAddress, homeOfficeValue);
+                getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
             } else {
                 // otherwise save basic info to the excel
                 System.out.println("Basic info: " + positionName);
@@ -373,20 +373,27 @@ public class JobsPage {
         System.out.println(workFromHome);
     }
 
-    private void getDetailedInformation(String positionName, String timestamp, String link, String homeOfficeValue) throws IOException {
+    private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link,
+                                        String salaryValue, String homeOfficeValue) throws IOException {
         System.out.println("Detail info: " + positionName);
+
         // create empty string variables for the detailed information
-        String company = "";
-        String address = "";
-        String education = "";
-        String languages = "";
-        String salary = "";
-        String benefits = "";
-        String workTags = "";
-        String typeOfEmployment = "";
-        String lengthOfEmployment = "";
-        String typeOfContract = "";
-        String authority = "";
+        String address, education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+                typeOfContract, authority;
+
+        address = education = languages = salary = benefits = workTags = typeOfEmployment = lengthOfEmployment =
+                typeOfContract = authority = "";
+
+//        String address = "";
+//        String education = "";
+//        String languages = "";
+//        String salary = "";
+//        String benefits = "";
+//        String workTags = "";
+//        String typeOfEmployment = "";
+//        String lengthOfEmployment = "";
+//        String typeOfContract = "";
+//        String authority = "";
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, detailInfoElement);
@@ -442,10 +449,9 @@ public class JobsPage {
 //            System.out.println("Typ smlouvy: " + typeOfContract);
 //            System.out.println("Zadavatel: " + authority);
 
-            ExcelWriter(timestamp, positionName, company, link, salary, homeOfficeValue,
+            ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue,
                     "YES", education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
                     typeOfContract, authority);
-
         } else {
             System.out.println("nah");
         }
@@ -474,9 +480,9 @@ public class JobsPage {
 
         String elementText = driver.findElement(By.xpath(xpath)).getText();
 
-        if (elementText.contains(CONTRACT_DURATION_TEXT_CZ)) {
+        if (elementText.contains(EDUCATION_TEXT_CZ) || elementText.contains(EMPLOYER_TEXT_CZ)) {
             return "CZECH";
-        } else if (elementText.contains(CONTRACT_DURATION_TEXT_EN)) {
+        } else if (elementText.contains(CONTRACT_DURATION_TEXT_EN)  || elementText.contains(EMPLOYER_TEXT_EN)) {
             return "ENGLISH";
         }
 
