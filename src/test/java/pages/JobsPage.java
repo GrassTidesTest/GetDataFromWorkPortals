@@ -135,7 +135,7 @@ public class JobsPage {
     }
 
     public void selectISITPositions() throws InterruptedException {
-        //dalo by se upravit, at pocka na to, az se nacte misto thread sleep
+        // can be changed so that it waits instead of nasty thread sleep
 
         //create list of profession we desire
         List<String> workPositions = Arrays.asList(ISIT_SPRAVA,
