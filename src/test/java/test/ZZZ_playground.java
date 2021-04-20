@@ -2,9 +2,6 @@ package test;
 
 import base.TestBase;
 import base.WebDriverSingleton;
-import enumerators.PositionLevel;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -49,8 +46,10 @@ public class ZZZ_playground extends TestBase {
         final String basic = "https://www.jobs.cz/rpd/1556485411/";
         final String medium = "https://www.jobs.cz/rpd/1552850796/";
         final String advanced = "https://www.jobs.cz/rpd/1555558490/";
+        final String contactPhone = "//span[@itemprop='telephone']";
+        final String contactName = "//span[@itemprop='name']/a";
 
-        String link = advanced;
+        String link = medium;
 
 
         WebDriver driver = WebDriverSingleton.getInstance().getDriver();
@@ -58,25 +57,18 @@ public class ZZZ_playground extends TestBase {
 
         new WebDriverWait(driver, 5);
 
-        System.out.println(getPositionLevel(link, driver));
-
+        System.out.println("Phone: '" + getContactInfo(driver, contactPhone) + "'");
+        System.out.println("Contact: '" + getContactInfo(driver, contactName) + "'");
     }
 
-    private PositionLevel getPositionLevel(String linkAddress, WebDriver driver) {
-        PositionLevel level;
-        boolean isDetailPresent = isElementPresentByXpath("//div[@data-visited-position]", driver);
-        boolean isUrlSame = driver.getCurrentUrl().equals(linkAddress);
+    private String getContactInfo(WebDriver driver, String xpath) {
+        String contactName = "";
 
-
-        if (isDetailPresent && isUrlSame) { // if both are true
-            level = PositionLevel.BASIC;
-        } else if (isDetailPresent ^ isUrlSame) { // if one is true but not both
-            level = PositionLevel.MEDIUM;
-        } else { // if both are false
-            level = PositionLevel.ADVANCED;
+        if (isElementPresentByXpath(xpath, driver)) {
+            contactName = driver.findElement(By.xpath(xpath)).getText();
         }
 
-        return level;
+        return contactName;
     }
 
     private boolean isElementPresentByXpath(String elementXpath, WebDriver driver) {
