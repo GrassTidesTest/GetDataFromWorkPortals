@@ -69,7 +69,7 @@ public class JobsPage {
 
 
     // Number of pages to check constant
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 5;
 
     // Search form
     @FindBy(xpath = "//div[@class='search-inputs']/div[1]//input")
@@ -300,13 +300,26 @@ public class JobsPage {
             openLinkInTab(linkAddress, tabs);
 
             // if the position's link and current url match, page was NOT redirected
-            if (driver.getCurrentUrl().equals(linkAddress)) {
-                // get the detailed information from the page
-                getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
-            } else {
-                // otherwise save basic info to the excel
-                System.out.println("Basic info: " + positionName);
-                ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "NO");
+//            if (driver.getCurrentUrl().equals(linkAddress)) {
+//                // get the detailed information from the page
+//                getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+//            } else {
+//                // otherwise save basic info to the excel
+//                System.out.println("Basic info: " + positionName);
+//                ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "NO");
+//            }
+
+            switch (getPositionLevel(linkAddress)) {
+                case BASIC:
+                case MEDIUM:
+                    // get the detailed information from the page
+                    getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+                    break;
+                case ADVANCED:
+                    // otherwise save basic info to the excel
+                    System.out.println("Basic info: " + positionName);
+                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "NO");
+                    break;
             }
 
             //close the current tab with the position and focus back on the position list page
