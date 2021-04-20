@@ -41,7 +41,7 @@ public class JobsPage {
     // Position detail page constants
     private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
     private static final String CONTACT_NAME_XPATH = "//span[@itemprop='name']/a";
-    private static final String CONTACT_PHONE_XPATH = "//span[@itemprop='telephone']";
+    private static final String CONTACT_INFO_XPATH = "//span[@itemprop='telephone']";
 
     // In Czech
     private static final String EDUCATION_TEXT_CZ = "Požadované vzdělání: ";
@@ -68,9 +68,8 @@ public class JobsPage {
     // In unknown language
     private static final String UNKNOWN_LANGUAGE = "Neznámý jazyk";
 
-
     // Number of pages to check constant
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 5;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
 
     // Search form
     @FindBy(xpath = "//div[@class='search-inputs']/div[1]//input")
@@ -427,15 +426,21 @@ public class JobsPage {
                                         String homeOfficeValue) throws IOException {
 
         // create empty string variables for the detailed information
-        String education, languages, salary, benefits, typeOfEmployment, typeOfContract, authority;
+        String contactName, contactPhone, education, languages, salary, benefits, typeOfEmployment, typeOfContract,
+                authority;
 
-        education = languages = salary = benefits = typeOfEmployment = typeOfContract = authority = "";
+        contactName = contactPhone = education = languages = salary = benefits = typeOfEmployment = typeOfContract
+                = authority = "";
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, detailInfoElement);
 
         // make sure the element exists before taking the info out of it
         if (doesElementExist(DETAIL_INFO_XPATH)) {
+
+            // get contact name and phone information
+            contactName = getContactInfo(CONTACT_NAME_XPATH);
+            contactPhone = getContactInfo(CONTACT_INFO_XPATH);
 
             // determine which language is used and save the info to variables
             switch (determineLanguage(DETAIL_INFO_XPATH)) {
@@ -469,7 +474,7 @@ public class JobsPage {
             }
 
             // write values to Excel
-            ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue,
+            ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue, contactName, contactPhone,
                     education, languages, salary, benefits, typeOfEmployment, typeOfContract, authority);
         } else {
             System.out.println("this should not happen - it means that the position was determined as detailed " +
@@ -525,13 +530,13 @@ public class JobsPage {
     }
 
     private void ExcelWriter(String timestamp, String positionName, String company, String link, String salary,
-                             String workFromHome, String education, String languages,
-                             String detailSalary, String benefits, String typeOfEmployment,
+                             String workFromHome, String contactName, String contactPhone, String education,
+                             String languages, String detailSalary, String benefits, String typeOfEmployment,
                              String typeOfContract, String authority) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
-                "YES", education, languages, detailSalary, benefits, typeOfEmployment,
+                "YES", contactName, contactPhone, education, languages, detailSalary, benefits, typeOfEmployment,
                 typeOfContract, authority};
 
         //Create an object of current class
