@@ -415,11 +415,9 @@ public class JobsPage {
                                         String homeOfficeValue) throws IOException {
 
         // create empty string variables for the detailed information
-        String education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
-                typeOfContract, authority;
+        String education, languages, salary, benefits, typeOfEmployment, typeOfContract, authority;
 
-        education = languages = salary = benefits = workTags = typeOfEmployment = lengthOfEmployment =
-                typeOfContract = authority = "";
+        education = languages = salary = benefits = typeOfEmployment = typeOfContract = authority = "";
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, detailInfoElement);
@@ -434,9 +432,7 @@ public class JobsPage {
                     languages = getInformationText(LANGUAGES_TEXT_CZ);
                     salary = getInformationText(SALARY_TEXT_CZ);
                     benefits = getInformationText(BENEFITS_TEXT_CZ);
-                    workTags = getInformationText(WORK_TAGS_TEXT_CZ);
                     typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
-                    lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_CZ);
                     typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
                     authority = getInformationText(EMPLOYER_TEXT_CZ);
                     break;
@@ -445,9 +441,7 @@ public class JobsPage {
                     languages = getInformationText(LANGUAGES_TEXT_EN);
                     salary = getInformationText(SALARY_TEXT_EN);
                     benefits = getInformationText(BENEFITS_TEXT_EN);
-                    workTags = getInformationText(WORK_TAGS_TEXT_EN);
                     typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_EN);
-                    lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_EN);
                     typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_EN);
                     authority = getInformationText(EMPLOYER_TEXT_EN);
                     break;
@@ -456,9 +450,7 @@ public class JobsPage {
                     languages = UNKNOWN_LANGUAGE;
                     salary = UNKNOWN_LANGUAGE;
                     benefits = UNKNOWN_LANGUAGE;
-                    workTags = UNKNOWN_LANGUAGE;
                     typeOfEmployment = UNKNOWN_LANGUAGE;
-                    lengthOfEmployment = UNKNOWN_LANGUAGE;
                     typeOfContract = UNKNOWN_LANGUAGE;
                     authority = UNKNOWN_LANGUAGE;
                     break;
@@ -466,11 +458,10 @@ public class JobsPage {
 
             // write values to Excel
             ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue,
-                    education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
-                    typeOfContract, authority);
+                    education, languages, salary, benefits, typeOfEmployment, typeOfContract, authority);
         } else {
-            System.out.println("this should not happen, ever - it means that the position was determined as detailed " +
-                    "but the detailed info is not on the page");
+            System.out.println("this should not happen - it means that the position was determined as detailed " +
+                    "but the detailed info is not on the page (possibly operator changed the code of the page)");
         }
     }
 
@@ -523,12 +514,12 @@ public class JobsPage {
 
     private void ExcelWriter(String timestamp, String positionName, String company, String link, String salary,
                              String workFromHome, String education, String languages,
-                             String detailSalary, String benefits, String workTags, String typeOfEmployment,
-                             String lengthOfEmployment, String typeOfContract, String authority) throws IOException {
+                             String detailSalary, String benefits, String typeOfEmployment,
+                             String typeOfContract, String authority) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
-                "YES", education, languages, detailSalary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+                "YES", education, languages, detailSalary, benefits, typeOfEmployment,
                 typeOfContract, authority};
 
         //Create an object of current class
