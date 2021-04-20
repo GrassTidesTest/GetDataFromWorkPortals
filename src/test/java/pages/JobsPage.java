@@ -511,7 +511,7 @@ public class JobsPage {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
-                "NO", "", "", "", "", "", "", "", "", "",};
+                "NO", "", "", "", "", "", "", "", "", ""};
 
         //Create an object of current class
         ExcelEditor objExcelFile = new ExcelEditor();
