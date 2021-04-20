@@ -313,7 +313,8 @@ public class JobsPage {
                 case BASIC:
                 case MEDIUM:
                     // get the detailed information from the page
-                    getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+                    System.out.println("Detail info: " + positionName);
+                    getDetailedInformation(timestamp, positionName, company, linkAddress, homeOfficeValue);
                     break;
                 case ADVANCED:
                     // otherwise save basic info to the excel
@@ -412,32 +413,22 @@ public class JobsPage {
     }
 
     private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link,
-                                        String salaryValue, String homeOfficeValue) throws IOException {
-        System.out.println("Detail info: " + positionName);
+                                        String homeOfficeValue) throws IOException {
 
         // create empty string variables for the detailed information
-        String address, education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+        String education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
                 typeOfContract, authority;
 
-        address = education = languages = salary = benefits = workTags = typeOfEmployment = lengthOfEmployment =
+        education = languages = salary = benefits = workTags = typeOfEmployment = lengthOfEmployment =
                 typeOfContract = authority = "";
-
-//        String address = "";
-//        String education = "";
-//        String languages = "";
-//        String salary = "";
-//        String benefits = "";
-//        String workTags = "";
-//        String typeOfEmployment = "";
-//        String lengthOfEmployment = "";
-//        String typeOfContract = "";
-//        String authority = "";
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, detailInfoElement);
 
+        // make sure the element exists before taking the info out of it
         if (doesElementExist(DETAIL_INFO_XPATH)) {
 
+            // determine which language is used and save the info to variables
             switch (determineLanguage(DETAIL_INFO_XPATH)) {
                 case "CZECH":
                     education = getInformationText(EDUCATION_TEXT_CZ);
@@ -450,7 +441,6 @@ public class JobsPage {
                     typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
                     authority = getInformationText(EMPLOYER_TEXT_CZ);
                     break;
-
                 case "ENGLISH":
                     education = getInformationText(EDUCATION_TEXT_EN);
                     languages = getInformationText(LANGUAGES_TEXT_EN);
@@ -462,7 +452,6 @@ public class JobsPage {
                     typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_EN);
                     authority = getInformationText(EMPLOYER_TEXT_EN);
                     break;
-
                 case "UNKNOWN":
                     education = UNKNOWN_LANGUAGE;
                     languages = UNKNOWN_LANGUAGE;
@@ -476,24 +465,14 @@ public class JobsPage {
                     break;
             }
 
-//            System.out.println("-------------------- DETAIL INFORMATION PRINTOUT --------------------");
-//            System.out.println("Vzdelani: " + education);
-//            System.out.println("Jazyky: " + languages);
-//            System.out.println("Plat: " + salary);
-//            System.out.println("Benefity: " + benefits);
-//            System.out.println("Tagy: " + workTags);
-//            System.out.println("Typ uvazku: " + typeOfEmployment);
-//            System.out.println("Delka uvazku: " + lengthOfEmployment);
-//            System.out.println("Typ smlouvy: " + typeOfContract);
-//            System.out.println("Zadavatel: " + authority);
-
+            // write values to Excel
             ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue,
                     "YES", education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
                     typeOfContract, authority);
         } else {
-            System.out.println("nah");
+            System.out.println("this should not happen, ever - it means that the position was determined as detailed " +
+                    "but the detailed info is not on the page");
         }
-
     }
 
     private String getInformationText(String informationName) {
