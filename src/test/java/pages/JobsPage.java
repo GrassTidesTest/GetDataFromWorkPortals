@@ -1,7 +1,6 @@
 package pages;
 
 import base.WebDriverSingleton;
-import enumerators.Language;
 import enumerators.PositionLevel;
 import helpers.ExcelEditor;
 import org.openqa.selenium.*;
@@ -319,7 +318,7 @@ public class JobsPage {
                 case ADVANCED:
                     // otherwise save basic info to the excel
                     System.out.println("Basic info: " + positionName);
-                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "NO");
+                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
                     break;
             }
 
@@ -467,7 +466,7 @@ public class JobsPage {
 
             // write values to Excel
             ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue,
-                    "YES", education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+                    education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
                     typeOfContract, authority);
         } else {
             System.out.println("this should not happen, ever - it means that the position was determined as detailed " +
@@ -508,11 +507,11 @@ public class JobsPage {
 
     // Calling ExcelEditor to write data to the excel file
     private void ExcelWriter(String timestamp, String positionName, String company,
-                             String link, String salary, String workFromHome, String isDetail) throws IOException {
+                             String link, String salary, String workFromHome) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
-                isDetail, "", "", "", "", "", "", "", "", "",};
+                "NO", "", "", "", "", "", "", "", "", "",};
 
         //Create an object of current class
         ExcelEditor objExcelFile = new ExcelEditor();
@@ -523,13 +522,13 @@ public class JobsPage {
     }
 
     private void ExcelWriter(String timestamp, String positionName, String company, String link, String salary,
-                             String workFromHome, String isDetail, String education, String languages,
+                             String workFromHome, String education, String languages,
                              String detailSalary, String benefits, String workTags, String typeOfEmployment,
                              String lengthOfEmployment, String typeOfContract, String authority) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
-                isDetail, education, languages, detailSalary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+                "YES", education, languages, detailSalary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
                 typeOfContract, authority};
 
         //Create an object of current class
