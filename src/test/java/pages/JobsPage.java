@@ -40,6 +40,8 @@ public class JobsPage {
 
     // Position detail page constants
     private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
+    private static final String CONTACT_NAME_XPATH = "//span[@itemprop='name']/a";
+    private static final String CONTACT_PHONE_XPATH = "//span[@itemprop='telephone']";
 
     // In Czech
     private static final String EDUCATION_TEXT_CZ = "Požadované vzdělání: ";
@@ -345,6 +347,16 @@ public class JobsPage {
         }
 
         return level;
+    }
+
+    private String getContactInfo(String xpath) {
+        String contactName = "";
+
+        if (isElementPresentByXpath(xpath)) {
+            contactName = driver.findElement(By.xpath(xpath)).getText();
+        }
+
+        return contactName;
     }
 
     private boolean isElementPresentByXpath(String elementXpath) {
