@@ -2,6 +2,7 @@ package pages;
 
 import base.WebDriverSingleton;
 import enumerators.Language;
+import enumerators.PositionLevel;
 import helpers.ExcelEditor;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
@@ -313,6 +314,30 @@ public class JobsPage {
         }
     }
 
+    private PositionLevel getPositionLevel(String linkAddress) {
+        PositionLevel level;
+        boolean isDetailPresent = isElementPresentByXpath("//div[@data-visited-position]");
+        boolean isUrlSame = driver.getCurrentUrl().equals(linkAddress);
+
+        if (isDetailPresent && isUrlSame) {
+            // if both are true
+            level = PositionLevel.BASIC;
+        } else if (isDetailPresent ^ isUrlSame) {
+            // if one is true but not both
+            level = PositionLevel.MEDIUM;
+        } else {
+            // if both are false,
+            // could be also UNKNOWN, but it doesn't matter
+            level = PositionLevel.ADVANCED;
+        }
+
+        return level;
+    }
+
+    private boolean isElementPresentByXpath(String elementXpath) {
+        return driver.findElements(By.xpath(elementXpath)).size() > 0;
+    }
+
     private String getLabelValue(WebElement parentElement, String xpath) {
         // define empty string
         String value = "";
@@ -482,7 +507,7 @@ public class JobsPage {
 
         if (elementText.contains(EDUCATION_TEXT_CZ) || elementText.contains(EMPLOYER_TEXT_CZ)) {
             return "CZECH";
-        } else if (elementText.contains(CONTRACT_DURATION_TEXT_EN)  || elementText.contains(EMPLOYER_TEXT_EN)) {
+        } else if (elementText.contains(CONTRACT_DURATION_TEXT_EN) || elementText.contains(EMPLOYER_TEXT_EN)) {
             return "ENGLISH";
         }
 
