@@ -429,7 +429,7 @@ public class JobsPage {
         String contactName, contactPhone, education, languages, salary, benefits, typeOfEmployment, typeOfContract,
                 authority;
 
-        contactName = contactPhone = education = languages = salary = benefits = typeOfEmployment = typeOfContract
+        education = languages = salary = benefits = typeOfEmployment = typeOfContract
                 = authority = "";
 
         // wait for the page to load
