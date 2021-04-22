@@ -1,7 +1,7 @@
 package pages;
 
 import base.WebDriverSingleton;
-import enumerators.Language;
+import enumerators.PositionLevel;
 import helpers.ExcelEditor;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
@@ -40,6 +40,8 @@ public class JobsPage {
 
     // Position detail page constants
     private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
+    private static final String CONTACT_NAME_XPATH = "//span[@itemprop='name']/a";
+    private static final String CONTACT_INFO_XPATH = "//span[@itemprop='telephone']";
 
     // In Czech
     private static final String EDUCATION_TEXT_CZ = "Požadované vzdělání: ";
@@ -65,7 +67,6 @@ public class JobsPage {
 
     // In unknown language
     private static final String UNKNOWN_LANGUAGE = "Neznámý jazyk";
-
 
     // Number of pages to check constant
     private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
@@ -299,18 +300,66 @@ public class JobsPage {
             openLinkInTab(linkAddress, tabs);
 
             // if the position's link and current url match, page was NOT redirected
-            if (driver.getCurrentUrl().equals(linkAddress)) {
-                // get the detailed information from the page
-                getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
-            } else {
-                // otherwise save basic info to the excel
-                System.out.println("Basic info: " + positionName);
-                ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "NO");
+//            if (driver.getCurrentUrl().equals(linkAddress)) {
+//                // get the detailed information from the page
+//                getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+//            } else {
+//                // otherwise save basic info to the excel
+//                System.out.println("Basic info: " + positionName);
+//                ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue, "NO");
+//            }
+
+            switch (getPositionLevel(linkAddress)) {
+                case BASIC:
+                case MEDIUM:
+                    // get the detailed information from the page
+                    System.out.println("Detail info: " + positionName);
+                    getDetailedInformation(timestamp, positionName, company, linkAddress, homeOfficeValue);
+                    break;
+                case ADVANCED:
+                    // otherwise save basic info to the excel
+                    System.out.println("Basic info: " + positionName);
+                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+                    break;
             }
 
             //close the current tab with the position and focus back on the position list page
             closeTabWithPosition(tabs);
         }
+    }
+
+    private PositionLevel getPositionLevel(String linkAddress) {
+        PositionLevel level;
+        boolean isDetailPresent = isElementPresentByXpath("//div[@data-visited-position]");
+        boolean isUrlSame = driver.getCurrentUrl().equals(linkAddress);
+
+        if (isDetailPresent && isUrlSame) {
+            // if both are true
+            level = PositionLevel.BASIC;
+        } else if (isDetailPresent ^ isUrlSame) {
+            // if one is true but not both
+            level = PositionLevel.MEDIUM;
+        } else {
+            // if both are false,
+            // could be also UNKNOWN, but it doesn't matter
+            level = PositionLevel.ADVANCED;
+        }
+
+        return level;
+    }
+
+    private String getContactInfo(String xpath) {
+        String contactName = "";
+
+        if (isElementPresentByXpath(xpath)) {
+            contactName = driver.findElement(By.xpath(xpath)).getText();
+        }
+
+        return contactName;
+    }
+
+    private boolean isElementPresentByXpath(String elementXpath) {
+        return driver.findElements(By.xpath(elementXpath)).size() > 0;
     }
 
     private String getLabelValue(WebElement parentElement, String xpath) {
@@ -374,88 +423,63 @@ public class JobsPage {
     }
 
     private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link,
-                                        String salaryValue, String homeOfficeValue) throws IOException {
-        System.out.println("Detail info: " + positionName);
+                                        String homeOfficeValue) throws IOException {
 
         // create empty string variables for the detailed information
-        String address, education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
-                typeOfContract, authority;
+        String contactName, contactPhone, education, languages, salary, benefits, typeOfEmployment, typeOfContract,
+                authority;
 
-        address = education = languages = salary = benefits = workTags = typeOfEmployment = lengthOfEmployment =
-                typeOfContract = authority = "";
-
-//        String address = "";
-//        String education = "";
-//        String languages = "";
-//        String salary = "";
-//        String benefits = "";
-//        String workTags = "";
-//        String typeOfEmployment = "";
-//        String lengthOfEmployment = "";
-//        String typeOfContract = "";
-//        String authority = "";
+        education = languages = salary = benefits = typeOfEmployment = typeOfContract
+                = authority = "";
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, detailInfoElement);
 
+        // make sure the element exists before taking the info out of it
         if (doesElementExist(DETAIL_INFO_XPATH)) {
 
+            // get contact name and phone information
+            contactName = getContactInfo(CONTACT_NAME_XPATH);
+            contactPhone = getContactInfo(CONTACT_INFO_XPATH);
+
+            // determine which language is used and save the info to variables
             switch (determineLanguage(DETAIL_INFO_XPATH)) {
                 case "CZECH":
                     education = getInformationText(EDUCATION_TEXT_CZ);
                     languages = getInformationText(LANGUAGES_TEXT_CZ);
                     salary = getInformationText(SALARY_TEXT_CZ);
                     benefits = getInformationText(BENEFITS_TEXT_CZ);
-                    workTags = getInformationText(WORK_TAGS_TEXT_CZ);
                     typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
-                    lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_CZ);
                     typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
                     authority = getInformationText(EMPLOYER_TEXT_CZ);
                     break;
-
                 case "ENGLISH":
                     education = getInformationText(EDUCATION_TEXT_EN);
                     languages = getInformationText(LANGUAGES_TEXT_EN);
                     salary = getInformationText(SALARY_TEXT_EN);
                     benefits = getInformationText(BENEFITS_TEXT_EN);
-                    workTags = getInformationText(WORK_TAGS_TEXT_EN);
                     typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_EN);
-                    lengthOfEmployment = getInformationText(CONTRACT_DURATION_TEXT_EN);
                     typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_EN);
                     authority = getInformationText(EMPLOYER_TEXT_EN);
                     break;
-
                 case "UNKNOWN":
                     education = UNKNOWN_LANGUAGE;
                     languages = UNKNOWN_LANGUAGE;
                     salary = UNKNOWN_LANGUAGE;
                     benefits = UNKNOWN_LANGUAGE;
-                    workTags = UNKNOWN_LANGUAGE;
                     typeOfEmployment = UNKNOWN_LANGUAGE;
-                    lengthOfEmployment = UNKNOWN_LANGUAGE;
                     typeOfContract = UNKNOWN_LANGUAGE;
                     authority = UNKNOWN_LANGUAGE;
                     break;
             }
 
-//            System.out.println("-------------------- DETAIL INFORMATION PRINTOUT --------------------");
-//            System.out.println("Vzdelani: " + education);
-//            System.out.println("Jazyky: " + languages);
-//            System.out.println("Plat: " + salary);
-//            System.out.println("Benefity: " + benefits);
-//            System.out.println("Tagy: " + workTags);
-//            System.out.println("Typ uvazku: " + typeOfEmployment);
-//            System.out.println("Delka uvazku: " + lengthOfEmployment);
-//            System.out.println("Typ smlouvy: " + typeOfContract);
-//            System.out.println("Zadavatel: " + authority);
-
-            ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue,
-                    "YES", education, languages, salary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
-                    typeOfContract, authority);
+            // write values to Excel
+            ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue, contactName, contactPhone,
+                    education, languages, salary, benefits, typeOfEmployment, typeOfContract, authority);
         } else {
-            System.out.println("nah");
+            System.out.println("this should not happen - it means that the position was determined as detailed " +
+                    "but the detailed info is not on the page (possibly operator changed the code of the page)");
         }
-
     }
 
     private String getInformationText(String informationName) {
@@ -482,7 +506,7 @@ public class JobsPage {
 
         if (elementText.contains(EDUCATION_TEXT_CZ) || elementText.contains(EMPLOYER_TEXT_CZ)) {
             return "CZECH";
-        } else if (elementText.contains(CONTRACT_DURATION_TEXT_EN)  || elementText.contains(EMPLOYER_TEXT_EN)) {
+        } else if (elementText.contains(CONTRACT_DURATION_TEXT_EN) || elementText.contains(EMPLOYER_TEXT_EN)) {
             return "ENGLISH";
         }
 
@@ -491,11 +515,11 @@ public class JobsPage {
 
     // Calling ExcelEditor to write data to the excel file
     private void ExcelWriter(String timestamp, String positionName, String company,
-                             String link, String salary, String workFromHome, String isDetail) throws IOException {
+                             String link, String salary, String workFromHome) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
-                isDetail, "", "", "", "", "", "", "", "", "",};
+                "NO", "", "", "", "", "", "", "", "", ""};
 
         //Create an object of current class
         ExcelEditor objExcelFile = new ExcelEditor();
@@ -506,13 +530,13 @@ public class JobsPage {
     }
 
     private void ExcelWriter(String timestamp, String positionName, String company, String link, String salary,
-                             String workFromHome, String isDetail, String education, String languages,
-                             String detailSalary, String benefits, String workTags, String typeOfEmployment,
-                             String lengthOfEmployment, String typeOfContract, String authority) throws IOException {
+                             String workFromHome, String contactName, String contactPhone, String education,
+                             String languages, String detailSalary, String benefits, String typeOfEmployment,
+                             String typeOfContract, String authority) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, JobsPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
-                isDetail, education, languages, detailSalary, benefits, workTags, typeOfEmployment, lengthOfEmployment,
+                "YES", contactName, contactPhone, education, languages, detailSalary, benefits, typeOfEmployment,
                 typeOfContract, authority};
 
         //Create an object of current class
