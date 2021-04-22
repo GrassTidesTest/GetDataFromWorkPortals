@@ -7,8 +7,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class ZZZ_playground extends TestBase {
-//public class ZZZ_playground {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+
+//public class ZZZ_playground extends TestBase {
+public class ZZZ_playground {
 //    static int numberOfFailedTests;
 //
 //    @BeforeClass
@@ -41,37 +47,52 @@ public class ZZZ_playground extends TestBase {
 //        System.out.println("No. failed tests: " + numberOfFailedTests + "\n");
 //    }
 
+    private final String timestampPattern = "ddMMyy";
+    private final String filePrefix = "data_";
+    private final String filePortal = "jobscz_";
+    //    private final String fileDate = getTimeStamp(timestampPattern);
+    private final String fileExtension = ".xlsx";
+
     @Test
     public void test() {
-        final String basic = "https://www.jobs.cz/rpd/1556485411/";
-        final String medium = "https://www.jobs.cz/rpd/1552850796/";
-        final String advanced = "https://www.jobs.cz/rpd/1555558490/";
-        final String contactPhone = "//span[@itemprop='telephone']";
-        final String contactName = "//span[@itemprop='name']/a";
+        final String fileName = "data.xlsx";
+        final String path = "src/test/resources/test_folder/";
+        final String targetPath = "src/test/resources/test_folder/archive/";
 
-        String link = medium;
+        File sourceFile = new File(path + fileName);
+        File newFile = new File(targetPath + getFileName());
 
-
-        WebDriver driver = WebDriverSingleton.getInstance().getDriver();
-        driver.get(link);
-
-        new WebDriverWait(driver, 5);
-
-        System.out.println("Phone: '" + getContactInfo(driver, contactPhone) + "'");
-        System.out.println("Contact: '" + getContactInfo(driver, contactName) + "'");
-    }
-
-    private String getContactInfo(WebDriver driver, String xpath) {
-        String contactName = "";
-
-        if (isElementPresentByXpath(xpath, driver)) {
-            contactName = driver.findElement(By.xpath(xpath)).getText();
+        try {
+            Files.copy(sourceFile.toPath(), newFile.toPath());
+        } catch (Exception e) {
+            System.out.println("Error copying file to archive");
         }
-
-        return contactName;
     }
 
-    private boolean isElementPresentByXpath(String elementXpath, WebDriver driver) {
-        return driver.findElements(By.xpath(elementXpath)).size() > 0;
+    @Test
+    public void test2() {
+        final String fileName = "data_empty.xlsx";
+        final String newFileName = "data.xlsx";
+        final String path = "src/test/resources/test_folder/";
+
+        File sourceFile = new File(path + fileName); // data_empty.xlsx
+        File newFile = new File(path + newFileName); // data.xlsx
+
+        try {
+            Files.deleteIfExists(newFile.toPath());
+            Files.copy(sourceFile.toPath(), newFile.toPath());
+        } catch (Exception e) {
+            System.out.println("Error rewriting data with empty_data");
+        }
+    }
+
+
+    private String getTimeStamp(String pattern) {
+        // return time stamp based on a pattern as a string
+        return new SimpleDateFormat(pattern).format(new java.util.Date());
+    }
+
+    private String getFileName() {
+        return filePrefix + filePortal + getTimeStamp(timestampPattern) + fileExtension;
     }
 }
