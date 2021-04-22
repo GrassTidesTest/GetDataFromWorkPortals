@@ -50,7 +50,6 @@ public class ZZZ_playground {
     private final String timestampPattern = "ddMMyy";
     private final String filePrefix = "data_";
     private final String filePortal = "jobscz_";
-    //    private final String fileDate = getTimeStamp(timestampPattern);
     private final String fileExtension = ".xlsx";
 
     @Test
@@ -85,7 +84,6 @@ public class ZZZ_playground {
             System.out.println("Error rewriting data with empty_data");
         }
     }
-
 
     private String getTimeStamp(String pattern) {
         // return time stamp based on a pattern as a string
