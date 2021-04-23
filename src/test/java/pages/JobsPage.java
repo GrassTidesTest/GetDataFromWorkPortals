@@ -9,7 +9,9 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +69,11 @@ public class JobsPage {
 
     // In unknown language
     private static final String UNKNOWN_LANGUAGE = "Neznámý jazyk";
+
+    // file management variables
+    private static final String FILE_TS_PATTERN = "ddMMyy";
+    private static final String FILE_PREFIX = "data";
+    private static final String FILE_PORTAL = "jobscz";
 
     // Number of pages to check constant
     private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
@@ -248,6 +255,40 @@ public class JobsPage {
             // if the code reaches the last page or the set limit, break the cycle
             if (getBreakCondition(i)) break;
         }
+    }
+
+    public void copyFileToFolder() throws IOException {
+        final String fileName = "data.xlsx";
+        final String path = "src/test/resources/";
+        final String targetPath = "src/test/resources/archive/";
+
+        File sourceFile = new File(path + fileName);
+        File newFile = new File(targetPath + getFileName());
+
+        Files.copy(sourceFile.toPath(), newFile.toPath());
+    }
+
+    public void replaceFileWithTemplate() throws IOException {
+        final String fileName = "data_empty.xlsx";
+        final String newFileName = "data.xlsx";
+        final String path = "src/test/resources/";
+
+        File sourceFile = new File(path + fileName); // data_empty.xlsx
+        File newFile = new File(path + newFileName); // data.xlsx
+
+        Files.deleteIfExists(newFile.toPath());
+        Files.copy(sourceFile.toPath(), newFile.toPath());
+    }
+
+    public void copyToRemoteDriver() throws IOException {
+        final String sourcePath = "src/test/resources/archive/";
+        final String targetPath = "C:/DEVPACK_Synology/HR Shared Folder/Work Portal Crawler data/";
+        final String fileName = getFileName();
+
+        File sourceFile = new File(sourcePath + fileName);
+        File newFile = new File(targetPath + fileName);
+
+        Files.copy(sourceFile.toPath(), newFile.toPath());
     }
 
     private boolean getBreakCondition(int i) {
@@ -558,5 +599,10 @@ public class JobsPage {
 
         //Call read file method of the class to read data
         return objExcelFile.ReadFromExcel(filePath, fileName, sheetName);
+    }
+
+    private String getFileName() {
+        // e.g. data_jobscz_220421.xlsx
+        return String.format("%s_%s_%s.xlsx",FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
     }
 }

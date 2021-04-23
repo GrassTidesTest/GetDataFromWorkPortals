@@ -20,5 +20,9 @@ public class JobsTest extends TestBase {
         jobsPage.clickSearchButton();
 
         jobsPage.savePositionsToExcel();
+
+        jobsPage.copyFileToFolder();
+        jobsPage.replaceFileWithTemplate();
+        jobsPage.copyToRemoteDriver();
     }
 }

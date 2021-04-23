@@ -51,6 +51,17 @@ public class ZZZ_playgroundPage {
 
     private String getFileName() {
         // data_jobscz_220421.xlsx
-        return String.format("%s_%s_%s.xlsx",FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
+        return String.format("%s_%s_%s.xlsx", FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
+    }
+
+    public void copyToRemoteDriver() throws IOException {
+        final String sourcePath = "src/test/resources/archive/";
+        final String targetPath = "C:/DEVPACK_Synology/HR Shared Folder/Work Portal Crawler data/";
+        final String fileName = getFileName();
+
+        File sourceFile = new File(sourcePath + fileName);
+        File newFile = new File(targetPath + fileName);
+
+        Files.copy(sourceFile.toPath(), newFile.toPath());
     }
 }

@@ -22,11 +22,6 @@ public class WebDriverSingleton {
     private void initializeGoogleChrome() {
         System.setProperty("webdriver.chrome.driver", "src/test/resources/drivers/chromedriver.exe");
         driver = new ChromeDriver();
-
-//        System.setProperty("webdriver.chrome.driver", "src/test/resources/drivers/chromedriver.exe");
-//        ChromeOptions options = new ChromeOptions();
-//        options.addArguments("--headless");
-//        driver = new ChromeDriver(options);
     }
 
     public WebDriver getDriver() {

@@ -13,27 +13,6 @@ public class ZZZ_playground {
     public void test() throws IOException {
         ZZZ_playgroundPage zzz_playgroundPage = new ZZZ_playgroundPage();
 
-        zzz_playgroundPage.copyFileToFolder();
-        zzz_playgroundPage.replaceFileWithTemplate();
-    }
-
-    @Test
-    public void string() {
-        System.out.println("data_jobscz_220421.xlsx");
-        System.out.println(getFileName());
-    }
-
-    private static final String FILE_TS_PATTERN = "ddMMyy";
-    private static final String FILE_PREFIX = "data";
-    private static final String FILE_PORTAL = "jobscz";
-
-    private String getFileName() {
-        // data_jobscz_220421.xlsx
-        return String.format("%s_%s_%s.xlsx",FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
-    }
-
-    private String getTimeStamp(String pattern) {
-        // return time stamp based on a pattern as a string
-        return new SimpleDateFormat(pattern).format(new java.util.Date());
+        zzz_playgroundPage.copyToRemoteDriver();
     }
 }
