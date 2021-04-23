@@ -1,30 +1,56 @@
 package pages;
 
 import base.WebDriverSingleton;
-import org.openqa.selenium.*;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.ArrayList;
-
-import static junit.framework.TestCase.assertEquals;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 
 public class ZZZ_playgroundPage {
     private WebDriver driver;
+
+    private static final String FILE_TS_PATTERN = "ddMMyy";
+    private static final String FILE_PREFIX = "data";
+    private static final String FILE_PORTAL = "jobscz";
 
     public ZZZ_playgroundPage() {
         driver = WebDriverSingleton.getInstance().getDriver();
         PageFactory.initElements(driver, this);
     }
 
-    public void stringManipulation() {
-        driver.get("https://www.jobs.cz/rpd/1556336089/");
-        new WebDriverWait(driver, 5);
+    public void copyFileToFolder() throws IOException {
+        final String fileName = "data.xlsx";
+        final String path = "src/test/resources/test_folder/";
+        final String targetPath = "src/test/resources/test_folder/archive/";
 
-        String fullText = driver.findElement(By.xpath("//div[h3[text()='Informace o pozici']]/dl/dd[span[text()='Požadované vzdělání: ']]")).getText();
-        String parentText = fullText.substring(fullText.indexOf(":") + 2);
+        File sourceFile = new File(path + fileName);
+        File newFile = new File(targetPath + getFileName());
 
-        System.out.println(fullText);
-        System.out.println(parentText);
+        Files.copy(sourceFile.toPath(), newFile.toPath());
+    }
+
+    public void replaceFileWithTemplate() throws IOException {
+        final String fileName = "data_empty.xlsx";
+        final String newFileName = "data.xlsx";
+        final String path = "src/test/resources/test_folder/";
+
+        File sourceFile = new File(path + fileName); // data_empty.xlsx
+        File newFile = new File(path + newFileName); // data.xlsx
+
+        Files.deleteIfExists(newFile.toPath());
+        Files.copy(sourceFile.toPath(), newFile.toPath());
+    }
+
+    private String getTimeStamp(String pattern) {
+        // return time stamp based on a pattern as a string
+        return new SimpleDateFormat(pattern).format(new java.util.Date());
+    }
+
+    private String getFileName() {
+        // data_jobscz_220421.xlsx
+        return String.format("%s_%s_%s.xlsx",FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
     }
 }
