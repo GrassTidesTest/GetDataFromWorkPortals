@@ -362,6 +362,9 @@ public class JobsPage {
                     System.out.println("Basic info: " + positionName);
                     ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
                     break;
+                case CLOSED:
+                    // position is closed
+                    System.out.println("Closed: " + positionName);
             }
 
             //close the current tab with the position and focus back on the position list page
@@ -373,6 +376,11 @@ public class JobsPage {
         PositionLevel level;
         boolean isDetailPresent = isElementPresentByXpath("//div[@data-visited-position]");
         boolean isUrlSame = driver.getCurrentUrl().equals(linkAddress);
+        boolean isPositionClosed = isPositionClosed();
+
+        if (isPositionClosed) {
+            return PositionLevel.CLOSED;
+        }
 
         if (isDetailPresent && isUrlSame) {
             // if both are true
@@ -387,6 +395,15 @@ public class JobsPage {
         }
 
         return level;
+    }
+
+    private boolean isPositionClosed() {
+        if (isElementPresentByXpath("//*[@id='recommended']//h1")) {
+            return driver.findElement(By.xpath("//*[@id='recommended']//h1"))
+                    .getText().equals("Tato nabídka zde již není");
+        }
+
+        return false;
     }
 
     private String getContactInfo(String xpath) {
@@ -603,6 +620,6 @@ public class JobsPage {
 
     private String getFileName() {
         // e.g. data_jobscz_220421.xlsx
-        return String.format("%s_%s_%s.xlsx",FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
+        return String.format("%s_%s_%s.xlsx", FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
     }
 }
