@@ -263,9 +263,9 @@ public class JobsPage {
     }
 
     public void copyFileToFolder() throws IOException {
-        final String fileName = "data.xlsx";
-        final String path = "src/test/resources/";
-        final String targetPath = "src/test/resources/archive/";
+        final String fileName = FILE_NAME;
+        final String path = RESOURCES_FOL_PATH;
+        final String targetPath = ARCHIVE_PATH;
 
         File sourceFile = new File(path + fileName);
         File newFile = new File(targetPath + getFileName());
@@ -274,9 +274,9 @@ public class JobsPage {
     }
 
     public void replaceFileWithTemplate() throws IOException {
-        final String fileName = "data_empty.xlsx";
-        final String newFileName = "data.xlsx";
-        final String path = "src/test/resources/";
+        final String fileName = EMPTY_FILE_NAME;
+        final String newFileName = FILE_NAME;
+        final String path = RESOURCES_FOL_PATH;
 
         File sourceFile = new File(path + fileName); // data_empty.xlsx
         File newFile = new File(path + newFileName); // data.xlsx
@@ -286,8 +286,8 @@ public class JobsPage {
     }
 
     public void copyToRemoteDriver() throws IOException {
-        final String sourcePath = "src/test/resources/archive/";
-        final String targetPath = "C:/DEVPACK_Synology/HR Shared Folder/Work Portal Crawler data/";
+        final String sourcePath = ARCHIVE_PATH;
+        final String targetPath = REMOTE_DRIVE_PATH;
         final String fileName = getFileName();
 
         File sourceFile = new File(sourcePath + fileName);
