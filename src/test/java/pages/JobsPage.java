@@ -280,12 +280,10 @@ public class JobsPage {
     }
 
     public void copyToRemoteDriver() throws IOException {
-        final String sourcePath = ARCHIVE_PATH;
-        final String targetPath = REMOTE_DRIVE_PATH;
         final String fileName = getFileName();
 
-        File sourceFile = new File(sourcePath + fileName);
-        File newFile = new File(targetPath + fileName);
+        File sourceFile = new File(ARCHIVE_PATH + fileName);
+        File newFile = new File(REMOTE_DRIVE_PATH + fileName);
 
         Files.copy(sourceFile.toPath(), newFile.toPath());
     }
