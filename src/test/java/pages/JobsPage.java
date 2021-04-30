@@ -20,6 +20,14 @@ import java.util.List;
 public class JobsPage {
     private WebDriver driver;
 
+    // IMPORTANT VARIABLES
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
+    private static final String REMOTE_DRIVE_PATH = "C:/DEVPACK_Synology/HR Shared Folder/Work Portal Crawler data/";
+    private static final String ARCHIVE_PATH = "src/test/resources/archive/";
+    private static final String FILE_NAME = "data.xlsx";
+    private static final String EMPTY_FILE_NAME = "data_empty.xlsx";
+    private static final String RESOURCES_FOL_PATH = "src/test/resources/";
+
     private static final String BASE_URL = "https://www.jobs.cz/prace/";
     private static final String WEBSITE_NAME = "jobs.cz";
     private static final String SHEETNAME = "COLLECTED_DATA";
@@ -74,9 +82,6 @@ public class JobsPage {
     private static final String FILE_TS_PATTERN = "ddMMyy";
     private static final String FILE_PREFIX = "data";
     private static final String FILE_PORTAL = "jobscz";
-
-    // Number of pages to check constant
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
 
     // Search form
     @FindBy(xpath = "//div[@class='search-inputs']/div[1]//input")
