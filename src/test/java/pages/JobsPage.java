@@ -271,12 +271,9 @@ public class JobsPage {
     }
 
     public void replaceFileWithTemplate() throws IOException {
-        final String fileName = EMPTY_FILE_NAME;
-        final String newFileName = FILE_NAME;
-        final String path = RESOURCES_FOL_PATH;
 
-        File sourceFile = new File(path + fileName); // data_empty.xlsx
-        File newFile = new File(path + newFileName); // data.xlsx
+        File sourceFile = new File(RESOURCES_FOL_PATH + EMPTY_FILE_NAME); // data_empty.xlsx
+        File newFile = new File(RESOURCES_FOL_PATH + FILE_NAME); // data.xlsx
 
         Files.deleteIfExists(newFile.toPath());
         Files.copy(sourceFile.toPath(), newFile.toPath());
