@@ -83,6 +83,10 @@ public class JobsPage {
     private static final String FILE_PREFIX = "data";
     private static final String FILE_PORTAL = "jobscz";
 
+    // position closed
+    private final static String CLOSED_POSITION_XPATH = "//*[@id='recommended']//h1";
+    private final static String CLOSED_POSITION_TEXT = "Tato nabídka zde již není";
+
     // Search form
     @FindBy(xpath = "//div[@class='search-inputs']/div[1]//input")
     private WebElement workInput;
@@ -395,9 +399,9 @@ public class JobsPage {
     }
 
     private boolean isPositionClosed() {
-        if (isElementPresentByXpath("//*[@id='recommended']//h1")) {
-            return driver.findElement(By.xpath("//*[@id='recommended']//h1"))
-                    .getText().equals("Tato nabídka zde již není");
+        if (isElementPresentByXpath(CLOSED_POSITION_XPATH)) {
+            return driver.findElement(By.xpath(CLOSED_POSITION_XPATH))
+                    .getText().equals(CLOSED_POSITION_TEXT);
         }
 
         return false;
