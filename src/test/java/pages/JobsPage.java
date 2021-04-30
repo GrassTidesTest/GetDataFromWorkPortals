@@ -263,12 +263,9 @@ public class JobsPage {
     }
 
     public void copyFileToFolder() throws IOException {
-        final String fileName = FILE_NAME;
-        final String path = RESOURCES_FOL_PATH;
-        final String targetPath = ARCHIVE_PATH;
 
-        File sourceFile = new File(path + fileName);
-        File newFile = new File(targetPath + getFileName());
+        File sourceFile = new File(RESOURCES_FOL_PATH + FILE_NAME);
+        File newFile = new File(ARCHIVE_PATH + getFileName());
 
         Files.copy(sourceFile.toPath(), newFile.toPath());
     }
