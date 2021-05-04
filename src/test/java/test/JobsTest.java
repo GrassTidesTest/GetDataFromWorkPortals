@@ -16,7 +16,7 @@ public class JobsTest extends TestBase {
         jobsPage.selectISITPositions();
         jobsPage.selectRemoteWork();
         jobsPage.selectFullTime();
-        jobsPage.recheckAllInputs();
+//        jobsPage.recheckAllInputs();
         jobsPage.clickSearchButton();
 
         jobsPage.savePositionsToExcel();
