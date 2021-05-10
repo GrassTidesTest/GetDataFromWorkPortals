@@ -1,6 +1,7 @@
 package pages;
 
 import base.WebDriverSingleton;
+import helpers.ExcelEditor;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -8,6 +9,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class PracePage {
     private WebDriver driver;
@@ -16,12 +19,24 @@ public class PracePage {
     private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
     private static final int TIMEOUT_IN_SECS = 5;
 
-
     private static final String BASE_URL = "https://www.prace.cz/nabidky/";
+    private static final String WEBSITE_NAME = "prace.cz";
+    private static final String SHEETNAME = "COLLECTED_DATA";
+
     private static final String IT_PROFESSION = "IT";
-    private static final String POSITIONS_XPATH = "//ul/li/div[contains(@class,'grid--rev')]";
+    private static final String POSITIONS_XPATH = "//ul/li[descendant::*[contains(@class,'grid--rev')]" +
+            "/div[contains(@class,'grid__item') and descendant::*[contains(@class,'grid')]]]";
     private static final String MAIN_NEXT_PAGE_BUTTON_XPATH = "//div[contains(@class,'pager')]";
     private static final String NEXT_PAGE_BUTTON_XPATH = MAIN_NEXT_PAGE_BUTTON_XPATH + "//span[@class='pager__next']";
+
+    // Page with position contants
+    private static final String TIMESTAMP_PATTERN = "dd.MM.yyyy HH:mm";
+    private static final String POSITION_NAME_XPATH = "//h3";
+    private static final String POSITION_COMPANY_XPATH = "//div[contains(@class,'company')]";
+    private static final String POSITION_LINK_XPATH = "//h3/a";
+    private static final String SALARY_LABEL_XPATH = "//*[contains(@class,'salary')]";
+    private static final String HOMEOFFICE_LABEL_XPATH = "//*[contains(@class,'search-list__home-office--label')]";
+
 
     @FindBy(id = "showSearchFormBtn")
     private WebElement showSearchFormBtn;
@@ -110,14 +125,78 @@ public class PracePage {
 
             // send positions size to the function
             // go through the list of positions and save them to excel
-//            getPositionsAndSaveThemToExcel(positions_size);
-            System.out.println(i + " : " + positions_size);
+            getPositionsAndSaveThemToExcel(positions_size);
+//            System.out.println(i + " : " + positions_size);
 
             // if the code reaches the last page or the set limit, break the cycle
             if (getBreakCondition(i)) break;
         }
     }
 
+    private void getPositionsAndSaveThemToExcel(int positions_size) throws IOException {
+
+        // go through the list of positions and for each position determine
+        // if the basic info or detail info will be saved to the excel
+        for (int i = 1; i < positions_size + 1; i++) {
+
+            // wait for the page to load
+            waitForVisibilityOfElement(driver, contentWrapper);
+
+            // get webElement of the current position
+            // use i in xpath to determine which position from the list to work with
+            // i = 1, means it's the first position from the list etc.
+            WebElement position = driver.findElement(By.xpath(POSITIONS_XPATH + "[" + i + "]"));
+
+            // get basic information for the position and save it to corresponding variables
+            String timestamp = getTimeStamp(TIMESTAMP_PATTERN);
+            String positionName = getElementText(position, POSITION_NAME_XPATH);
+            String company = getCompanyText(position, POSITION_COMPANY_XPATH);
+            String linkAddress = cropPositionLink(position, POSITION_LINK_XPATH);
+            String salaryValue = getLabelValue(position, SALARY_LABEL_XPATH);
+//            String homeOfficeValue = getLabelValue(position, HOMEOFFICE_LABEL_XPATH);
+
+            System.out.println(timestamp);
+            System.out.println(positionName);
+            System.out.println(company);
+            System.out.println(linkAddress);
+            System.out.println(salaryValue);
+
+            ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
+
+            System.out.println("-----------------------------");
+
+//            // open new tab and create ArrayList with windowHandles
+//            ((JavascriptExecutor) driver).executeScript("window.open()");
+//            ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
+//
+//            // open the current position in new tab
+//            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
+//            openLinkInTab(linkAddress, currentTabs);
+//
+//            // get position level and decide what to do with the position
+//            switch (getPositionLevel(linkAddress)) {
+//                case BASIC:
+//                case MEDIUM:
+//                    // get the detailed information from the page for BASIC and MEDIUM
+//                    // print what info from which position you save
+//                    System.out.println("Detail info: " + positionName);
+//                    getDetailedInformation(timestamp, positionName, company, linkAddress, homeOfficeValue);
+//                    break;
+//                case ADVANCED:
+//                    // otherwise save basic info to the excel, reading it from different layouts is not an option here
+//                    // print what info from which position you save
+//                    System.out.println("Basic info: " + positionName);
+//                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+//                    break;
+//                case CLOSED:
+//                    // position is closed and there is nothing we can do
+//                    System.out.println("Closed: " + positionName);
+//            }
+//
+//            //close the current tab with the position and focus back on the position list page
+//            closeTabWithPosition(currentTabs);
+        }
+    }
 
     private boolean getBreakCondition(int i) {
 
@@ -153,6 +232,63 @@ public class PracePage {
     private void waitForVisibilityOfElement(WebDriver driver, WebElement webElement) {
         new WebDriverWait(driver, TIMEOUT_IN_SECS)
                 .until(ExpectedConditions.visibilityOf(webElement));
+    }
+
+    private String getTimeStamp(String pattern) {
+        // return time stamp based on a pattern
+        return new SimpleDateFormat(pattern).format(new java.util.Date());
+    }
+
+    private String getElementText(WebElement parentElement, String xpath) {
+        // return text of the element based on the parentElement and xpath
+        return parentElement.findElement(By.xpath("." + xpath)).getText();
+    }
+
+    private String getCompanyText(WebElement parentElement, String xpath) {
+        // crop the •\n from the company name and return
+        String originalString = parentElement.findElement(By.xpath("." + xpath)).getText();
+
+        return originalString.substring(originalString.indexOf("•") + 2);
+    }
+
+    private String cropPositionLink(WebElement parentElement, String xpath) {
+        // get the href value from the element
+        String originalString = parentElement.findElement(By.xpath("." + xpath)).getAttribute("href");
+
+        // crop the link so that the part after ? including is not present
+        // link must contain ? otherwise it fails
+        return originalString.substring(0, originalString.indexOf("?"));
+    }
+
+    private String getLabelValue(WebElement parentElement, String xpath) {
+        // define empty string
+        String value = "";
+
+        // if the element exists
+        if (parentElement.findElements(By.xpath("." + xpath)).size() > 0) {
+
+            // save it's value to the string
+            value = parentElement.findElement(By.xpath("." + xpath)).getText().trim();
+        }
+
+        return value;
+    }
+
+
+    // Calling ExcelEditor to write data to the excel file
+    private void ExcelWriter(String timestamp, String positionName, String company,
+                             String link, String salary) throws IOException {
+
+        //Create an array with the data in the same order in which you expect to be filled in excel file
+        String[] valueToWrite = {timestamp, PracePage.WEBSITE_NAME, positionName, company, link, salary, "",
+                "NO", "", "", "", "", "", "", "", "", ""};
+
+        //Create an object of current class
+        ExcelEditor objExcelFile = new ExcelEditor();
+
+        //Write the file using file name, sheet name and the data to be filled
+        objExcelFile.WriteToExcel(System.getProperty("user.dir") + "\\src\\test\\resources",
+                base.TestBase.FILE_NAME, PracePage.SHEETNAME, valueToWrite);
     }
 
 //    public void recheckAllInputs() {
