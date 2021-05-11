@@ -1,6 +1,7 @@
 package pages;
 
 import base.WebDriverSingleton;
+import enumerators.PositionLevel;
 import helpers.ExcelEditor;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
@@ -12,11 +13,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import static enumerators.PositionLevel.*;
+
 public class PracePage {
     private WebDriver driver;
 
     // IMPORTANT VARIABLES
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 1;
     private static final int TIMEOUT_IN_SECS = 5;
 
     private static final String BASE_URL = "https://www.prace.cz/nabidky/";
@@ -156,45 +159,47 @@ public class PracePage {
 //            String homeOfficeValue = getLabelValue(position, HOMEOFFICE_LABEL_XPATH);
 
             System.out.println(timestamp);
-            System.out.println(positionName);
-            System.out.println(company);
-            System.out.println(linkAddress);
-            System.out.println(salaryValue);
+//            System.out.println(positionName);
+//            System.out.println(company);
+//            System.out.println(linkAddress);
+//            System.out.println(salaryValue);
 
             ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
 
-            System.out.println("-----------------------------");
-
-//            // open new tab and create ArrayList with windowHandles
-//            ((JavascriptExecutor) driver).executeScript("window.open()");
-//            ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
+            // open new tab and create ArrayList with windowHandles
+            ((JavascriptExecutor) driver).executeScript("window.open()");
+            ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
 //
 //            // open the current position in new tab
 //            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
-//            openLinkInTab(linkAddress, currentTabs);
-//
-//            // get position level and decide what to do with the position
-//            switch (getPositionLevel(linkAddress)) {
-//                case BASIC:
-//                case MEDIUM:
-//                    // get the detailed information from the page for BASIC and MEDIUM
-//                    // print what info from which position you save
-//                    System.out.println("Detail info: " + positionName);
+            openLinkInTab(linkAddress, currentTabs);
+            System.out.println("----TAB OPENED----");
+
+            // get position level and decide what to do with the position
+            switch (getPositionLevel(linkAddress)) {
+                case BASIC:
+                case MEDIUM:
+                    // get the detailed information from the page for BASIC and MEDIUM
+                    // print what info from which position you save
+                    System.out.println("Detail info: " + positionName);
 //                    getDetailedInformation(timestamp, positionName, company, linkAddress, homeOfficeValue);
-//                    break;
-//                case ADVANCED:
-//                    // otherwise save basic info to the excel, reading it from different layouts is not an option here
-//                    // print what info from which position you save
-//                    System.out.println("Basic info: " + positionName);
+                    break;
+                case ADVANCED:
+                    // otherwise save basic info to the excel, reading it from different layouts is not an option here
+                    // print what info from which position you save
+                    System.out.println("Basic info: " + positionName);
 //                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
-//                    break;
-//                case CLOSED:
-//                    // position is closed and there is nothing we can do
-//                    System.out.println("Closed: " + positionName);
-//            }
-//
-//            //close the current tab with the position and focus back on the position list page
-//            closeTabWithPosition(currentTabs);
+                    break;
+                case CLOSED:
+                    // position is closed and there is nothing we can do
+                    System.out.println("Closed: " + positionName);
+                    break;
+            }
+
+            //close the current tab with the position and focus back on the position list page
+            closeTabWithPosition(currentTabs);
+            System.out.println("----TAB CLOSED----");
+            System.out.println();
         }
     }
 
@@ -274,6 +279,61 @@ public class PracePage {
         return value;
     }
 
+    private void openLinkInTab(String positionLink, ArrayList<String> tabs) {
+        // change focus to new window
+        driver.switchTo().window(tabs.get(1));
+
+        // open new link
+        driver.get(positionLink);
+    }
+
+    private void closeTabWithPosition(ArrayList<String> tabs) {
+        // close the tab
+        driver.close();
+
+        // change back to main windows
+        driver.switchTo().window(tabs.get(0));
+    }
+
+    private PositionLevel getPositionLevel(String linkAddress) {
+        PositionLevel level;
+        boolean isDetailPresent = isElementPresentByXpath("//div[@data-visited-position]");
+        boolean isUrlSame = driver.getCurrentUrl().equals(linkAddress);
+        boolean isPositionClosed = isPositionClosed();
+
+        if (isPositionClosed) {
+            return PositionLevel.CLOSED;
+        }
+
+        if (isDetailPresent && isUrlSame) {
+            // ↑ if both are true
+            level = PositionLevel.BASIC;
+        } else if (isDetailPresent ^ isUrlSame) {
+            // ↑ if one is true but not both
+            level = PositionLevel.MEDIUM;
+        } else {
+            // ↑ if both are false,
+            // ↓ could be also UNKNOWN, but it doesn't matter
+            level = PositionLevel.ADVANCED;
+        }
+
+        return level;
+    }
+
+    private boolean isElementPresentByXpath(String elementXpath) {
+        return driver.findElements(By.xpath(elementXpath)).size() > 0;
+    }
+
+    private boolean isPositionClosed() {
+        // check if the position is closed, return boolean
+        // TBH not fully tested may cause problems
+//        if (isElementPresentByXpath(CLOSED_POSITION_XPATH)) {
+//            return driver.findElement(By.xpath(CLOSED_POSITION_XPATH))
+//                    .getText().equals(CLOSED_POSITION_TEXT);
+//        }
+
+        return false;
+    }
 
     // Calling ExcelEditor to write data to the excel file
     private void ExcelWriter(String timestamp, String positionName, String company,

@@ -16,7 +16,7 @@ public class TestBase {
     @After
     public void tearDown() {
 //        WebDriverSingleton.getInstance().getDriver().close();
-//        WebDriverSingleton.getInstance().getDriver().quit();
+        WebDriverSingleton.getInstance().getDriver().quit();
     }
 
     private WebDriver getDriver() {
