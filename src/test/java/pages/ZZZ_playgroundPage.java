@@ -1,67 +1,46 @@
 package pages;
 
 import base.WebDriverSingleton;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 
 public class ZZZ_playgroundPage {
     private WebDriver driver;
 
-    private static final String FILE_TS_PATTERN = "ddMMyy";
-    private static final String FILE_PREFIX = "data";
-    private static final String FILE_PORTAL = "jobscz";
+    private static final String CONTACT_NAME_CLASS = "advert__recruiter";
+    private static final String CONTACT_INFO_CLASS = "advert__recruiter__phone";
+    private static final String CONTACT_NAME_CSS = "span.advert__recruiter";
+    private static final String CONTACT_INFO_CSS = "span.advert__recruiter__phone";
+    private static final String CONTACT_INFO_XPATH = "//span[@class='advert__recruiter__phone']";
+    private static final String CONTACT_NAME_XPATH = "//span[@class='advert__recruiter']";
 
     public ZZZ_playgroundPage() {
         driver = WebDriverSingleton.getInstance().getDriver();
         PageFactory.initElements(driver, this);
     }
 
-    public void copyFileToFolder() throws IOException {
-        final String fileName = "data.xlsx";
-        final String path = "src/test/resources/test_folder/";
-        final String targetPath = "src/test/resources/test_folder/archive/";
+    public void useClassSelector() {
+//        driver.get("https://www.prace.cz/nabidka/1556299434/");
+        driver.get("https://www.prace.cz/firma/335936766-mblue-czech-s-r-o/nabidka/1560460295/");
 
-        File sourceFile = new File(path + fileName);
-        File newFile = new File(targetPath + getFileName());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        WebElement element1 = driver.findElement(By.className(CONTACT_NAME_CLASS));
+        WebElement element2 = driver.findElement(By.className(CONTACT_INFO_CLASS));
+//        WebElement element1 = driver.findElement(By.cssSelector(CONTACT_NAME_CSS));
+//        WebElement element2 = driver.findElement(By.cssSelector(CONTACT_INFO_CSS));
+//        WebElement element1 = driver.findElement(By.xpath(CONTACT_NAME_XPATH));
+//        WebElement element2 = driver.findElement(By.xpath(CONTACT_INFO_XPATH));
 
-        Files.copy(sourceFile.toPath(), newFile.toPath());
-    }
+        ((JavascriptExecutor) driver).executeScript("arguments[0].style.border='3px solid red'", element1);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].style.border='3px solid blue'", element2);
 
-    public void replaceFileWithTemplate() throws IOException {
-        final String fileName = "data_empty.xlsx";
-        final String newFileName = "data.xlsx";
-        final String path = "src/test/resources/test_folder/";
-
-        File sourceFile = new File(path + fileName); // data_empty.xlsx
-        File newFile = new File(path + newFileName); // data.xlsx
-
-        Files.deleteIfExists(newFile.toPath());
-        Files.copy(sourceFile.toPath(), newFile.toPath());
-    }
-
-    private String getTimeStamp(String pattern) {
-        // return time stamp based on a pattern as a string
-        return new SimpleDateFormat(pattern).format(new java.util.Date());
-    }
-
-    private String getFileName() {
-        // data_jobscz_220421.xlsx
-        return String.format("%s_%s_%s.xlsx", FILE_PREFIX, FILE_PORTAL, getTimeStamp(FILE_TS_PATTERN));
-    }
-
-    public void copyToRemoteDriver() throws IOException {
-        final String sourcePath = "src/test/resources/archive/";
-        final String targetPath = "C:/DEVPACK_Synology/HR Shared Folder/Work Portal Crawler data/";
-        final String fileName = getFileName();
-
-        File sourceFile = new File(sourcePath + fileName);
-        File newFile = new File(targetPath + fileName);
-
-        Files.copy(sourceFile.toPath(), newFile.toPath());
+        System.out.println("Nezavirej");
     }
 }

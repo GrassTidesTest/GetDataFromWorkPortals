@@ -13,13 +13,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import static enumerators.PositionLevel.*;
-
 public class PracePage {
     private WebDriver driver;
 
     // IMPORTANT VARIABLES
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 1;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 30;
     private static final int TIMEOUT_IN_SECS = 5;
 
     private static final String BASE_URL = "https://www.prace.cz/nabidky/";
@@ -32,13 +30,31 @@ public class PracePage {
     private static final String MAIN_NEXT_PAGE_BUTTON_XPATH = "//div[contains(@class,'pager')]";
     private static final String NEXT_PAGE_BUTTON_XPATH = MAIN_NEXT_PAGE_BUTTON_XPATH + "//span[@class='pager__next']";
 
-    // Page with position contants
+    // Page with position constants
     private static final String TIMESTAMP_PATTERN = "dd.MM.yyyy HH:mm";
     private static final String POSITION_NAME_XPATH = "//h3";
     private static final String POSITION_COMPANY_XPATH = "//div[contains(@class,'company')]";
     private static final String POSITION_LINK_XPATH = "//h3/a";
-    private static final String SALARY_LABEL_XPATH = "//*[contains(@class,'salary')]";
+    private static final String SALARY_LABEL_XPATH = "//*[contains(@class,'--salary')]";
     private static final String HOMEOFFICE_LABEL_XPATH = "//*[contains(@class,'search-list__home-office--label')]";
+
+    // Position detail page constants
+    private static final String DETAIL_INFO_XPATH = "//div[@class='double-standalone']/dl";
+    private static final String CONTACT_NAME_CLASS = "advert__recruiter";
+    private static final String CONTACT_INFO_CLASS = "advert__recruiter__phone";
+
+    // In Czech
+    private static final String EDUCATION_TEXT_CZ = "Vzdělání:";
+    private static final String LANGUAGES_TEXT_CZ = "Jazyky:";
+    private static final String BENEFITS_TEXT_CZ = "Benefity:";
+    //    private static final String WORK_TAGS_TEXT_CZ = "Zařazeno: ";
+    private static final String EMPLOYMENT_FORM_TEXT_CZ = "Pracovní poměr:";
+    //    private static final String CONTRACT_DURATION_TEXT_CZ = "Délka pracovního poměru: ";
+    private static final String TYPE_OF_CONTRACT_TEXT_CZ = "Smluvní vztah:";
+    private static final String EMPLOYER_TEXT_CZ = "Firma:";
+    private static final String SUITABLE_FOR_TEXT_CZ = "Vhodné i pro:";
+    private static final String SALARY_XPATH = "//h3[contains(@class,'salary')]";
+    private static final String EMPLOYER_XPATH = "//dd[contains(@class,'company-name')]//strong";
 
 
     @FindBy(id = "showSearchFormBtn")
@@ -67,6 +83,11 @@ public class PracePage {
 
     @FindBy(xpath = NEXT_PAGE_BUTTON_XPATH)
     private WebElement nextPageButton;
+
+    // Position detail page
+    @FindBy(xpath = DETAIL_INFO_XPATH)
+    private WebElement detailInfoElement;
+
 
     public PracePage() {
         driver = WebDriverSingleton.getInstance().getDriver();
@@ -129,7 +150,6 @@ public class PracePage {
             // send positions size to the function
             // go through the list of positions and save them to excel
             getPositionsAndSaveThemToExcel(positions_size);
-//            System.out.println(i + " : " + positions_size);
 
             // if the code reaches the last page or the set limit, break the cycle
             if (getBreakCondition(i)) break;
@@ -158,13 +178,13 @@ public class PracePage {
             String salaryValue = getLabelValue(position, SALARY_LABEL_XPATH);
 //            String homeOfficeValue = getLabelValue(position, HOMEOFFICE_LABEL_XPATH);
 
-            System.out.println(timestamp);
+//            System.out.println(timestamp + "----------------------------------------------------------------------");
 //            System.out.println(positionName);
 //            System.out.println(company);
 //            System.out.println(linkAddress);
 //            System.out.println(salaryValue);
 
-            ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
+//            ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
 
             // open new tab and create ArrayList with windowHandles
             ((JavascriptExecutor) driver).executeScript("window.open()");
@@ -173,7 +193,7 @@ public class PracePage {
 //            // open the current position in new tab
 //            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
             openLinkInTab(linkAddress, currentTabs);
-            System.out.println("----TAB OPENED----");
+//            System.out.println("----TAB OPENED----");
 
             // get position level and decide what to do with the position
             switch (getPositionLevel(linkAddress)) {
@@ -182,7 +202,7 @@ public class PracePage {
                     // get the detailed information from the page for BASIC and MEDIUM
                     // print what info from which position you save
                     System.out.println("Detail info: " + positionName);
-//                    getDetailedInformation(timestamp, positionName, company, linkAddress, homeOfficeValue);
+                    getDetailedInformation(timestamp, positionName, company, linkAddress);
                     break;
                 case ADVANCED:
                     // otherwise save basic info to the excel, reading it from different layouts is not an option here
@@ -198,8 +218,86 @@ public class PracePage {
 
             //close the current tab with the position and focus back on the position list page
             closeTabWithPosition(currentTabs);
-            System.out.println("----TAB CLOSED----");
-            System.out.println();
+//            System.out.println("----------------------------------------------------TAB CLOSED----");
+//            System.out.println();
+        }
+    }
+
+    private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link)
+            throws IOException {
+
+        // create empty string variables for the detailed information
+        String contactName, contactPhone, education, languages, salary, benefits, typeOfEmployment, typeOfContract,
+                authority;
+
+        education = languages = salary = benefits = typeOfEmployment = typeOfContract
+                = authority = "";
+
+        // wait for the page to load
+        waitForVisibilityOfElement(driver, detailInfoElement);
+
+        // make sure the element exists before taking the info out of it
+        if (doesElementExist(DETAIL_INFO_XPATH)) {
+
+            // get contact name and phone information
+            contactName = getContactInfo(CONTACT_NAME_CLASS);
+            contactPhone = getContactInfo(CONTACT_INFO_CLASS);
+
+//            System.out.println("Link: " + link);
+//            System.out.println("Contact name: " + contactName);
+//            System.out.println("Contact phone: " + contactPhone);
+//
+//            // determine which language is used and save the info to variables
+//            switch (determineLanguage(DETAIL_INFO_XPATH)) {
+//
+//                // if the language is CZECH, use CZ text
+//                case "CZECH":
+                    education = getInformationText(EDUCATION_TEXT_CZ);
+                    languages = getInformationText(LANGUAGES_TEXT_CZ);
+                    salary = getOtherInfoText(SALARY_XPATH);
+                    benefits = getInformationText(BENEFITS_TEXT_CZ);
+                    typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
+                    typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
+                    authority = getOtherInfoText(EMPLOYER_XPATH);
+
+//            System.out.println("Education: " + education);
+//            System.out.println("Languages: " + languages);
+//            System.out.println("Salary: " + salary);
+//            System.out.println("Benefits: " + benefits);
+//            System.out.println("Type of employment: " + typeOfEmployment);
+//            System.out.println("Type of contract: " + typeOfContract);
+//            System.out.println("Authority: " + authority);
+
+//                    break;
+//
+//                // if the language is ENGLISH, use EN text
+//                case "ENGLISH":
+//                    education = getInformationText(EDUCATION_TEXT_EN);
+//                    languages = getInformationText(LANGUAGES_TEXT_EN);
+//                    salary = getInformationText(SALARY_TEXT_EN);
+//                    benefits = getInformationText(BENEFITS_TEXT_EN);
+//                    typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_EN);
+//                    typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_EN);
+//                    authority = getInformationText(EMPLOYER_TEXT_EN);
+//                    break;
+//                // if the language is UNKNOWN, don't bother and save UNKNOWN only
+//                case "UNKNOWN":
+//                    education = UNKNOWN_LANGUAGE;
+//                    languages = UNKNOWN_LANGUAGE;
+//                    salary = UNKNOWN_LANGUAGE;
+//                    benefits = UNKNOWN_LANGUAGE;
+//                    typeOfEmployment = UNKNOWN_LANGUAGE;
+//                    typeOfContract = UNKNOWN_LANGUAGE;
+//                    authority = UNKNOWN_LANGUAGE;
+//                    break;
+//        }
+
+            // write values to Excel
+            ExcelWriter(timestamp, positionName, companyValue, link, salary, contactName, contactPhone,
+                    education, languages, salary, benefits, typeOfEmployment, typeOfContract, authority);
+        } else {
+            System.out.println("this should not happen - it means that the position was determined as detailed " +
+                    "but the detailed info is not on the page (possibly operator changed the code of the page)");
         }
     }
 
@@ -297,7 +395,7 @@ public class PracePage {
 
     private PositionLevel getPositionLevel(String linkAddress) {
         PositionLevel level;
-        boolean isDetailPresent = isElementPresentByXpath("//div[@data-visited-position]");
+        boolean isDetailPresent = isElementPresentByXpath("//div[@class='double-standalone']");
         boolean isUrlSame = driver.getCurrentUrl().equals(linkAddress);
         boolean isPositionClosed = isPositionClosed();
 
@@ -324,6 +422,10 @@ public class PracePage {
         return driver.findElements(By.xpath(elementXpath)).size() > 0;
     }
 
+    private boolean isElementPresentByClass(String className) {
+        return driver.findElements(By.className(className)).size() > 0;
+    }
+
     private boolean isPositionClosed() {
         // check if the position is closed, return boolean
         // TBH not fully tested may cause problems
@@ -335,6 +437,81 @@ public class PracePage {
         return false;
     }
 
+    private boolean doesElementExist(String xpath) {
+        // same as isElementPresentByXpath - REFACTOR
+        return driver.findElements(By.xpath(xpath)).size() > 0;
+    }
+
+//    private String getContactInfo(String xpath) {
+//        // create empty string variable
+//        String contactName = "";
+//
+//        //if the element is present
+//        if (isElementPresentByXpath(xpath)) {
+//
+//            // save it's value to variable
+//            contactName = driver.findElement(By.xpath(xpath)).getText();
+//        }
+//
+//        return contactName;
+//    }
+
+    private String getContactInfo(String className) {
+        //create empty string variable
+        String contactInfo = "";
+
+        // if the element is present
+        if (isElementPresentByClass(className)) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].style.border='3px solid red'",
+                    driver.findElement(By.className(className)));
+
+            contactInfo = driver.findElement(By.className(className)).getText();
+        }
+
+        return contactInfo;
+    }
+
+    private String getInformationText(String informationName) {
+
+        // create variables
+        String xpath = "." + "//dd[span[text()='" + informationName + "']]";
+        String fullText = "";
+
+        // if the required information element exists
+        if (detailInfoElement.findElements(By.xpath(xpath)).size() > 0) {
+
+            // save it's value to the variable
+            fullText = detailInfoElement.findElement(By.xpath(xpath)).getText();
+
+            // and return it
+            return fullText.substring(fullText.indexOf(":") + 1);
+        }
+
+        // otherwise return empty string
+        return fullText;
+    }
+
+    private String getOtherInfoText(String xpath){
+
+        // create variables
+        String fullText = "";
+
+        // if the required information element exists
+        if(driver.findElements(By.xpath(xpath)).size() > 0) {
+
+            // save it's value to the variable
+            fullText = driver.findElement(By.xpath(xpath)).getText();
+
+            // if the salary is not listed, leave it empty
+            if (fullText.equals("Plat neuveden"))
+                return fullText = "";
+
+            return fullText.substring(fullText.indexOf(":") + 1);
+        }
+
+        return fullText;
+    }
+
     // Calling ExcelEditor to write data to the excel file
     private void ExcelWriter(String timestamp, String positionName, String company,
                              String link, String salary) throws IOException {
@@ -342,6 +519,24 @@ public class PracePage {
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, PracePage.WEBSITE_NAME, positionName, company, link, salary, "",
                 "NO", "", "", "", "", "", "", "", "", ""};
+
+        //Create an object of current class
+        ExcelEditor objExcelFile = new ExcelEditor();
+
+        //Write the file using file name, sheet name and the data to be filled
+        objExcelFile.WriteToExcel(System.getProperty("user.dir") + "\\src\\test\\resources",
+                base.TestBase.FILE_NAME, PracePage.SHEETNAME, valueToWrite);
+    }
+
+    private void ExcelWriter(String timestamp, String positionName, String company, String link, String salary,
+                             String contactName, String contactPhone, String education,
+                             String languages, String detailSalary, String benefits, String typeOfEmployment,
+                             String typeOfContract, String authority) throws IOException {
+
+        //Create an array with the data in the same order in which you expect to be filled in excel file
+        String[] valueToWrite = {timestamp, PracePage.WEBSITE_NAME, positionName, company, link, salary, "",
+                "YES", contactName, contactPhone, education, languages, detailSalary, benefits, typeOfEmployment,
+                typeOfContract, authority};
 
         //Create an object of current class
         ExcelEditor objExcelFile = new ExcelEditor();
