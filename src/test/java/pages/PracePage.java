@@ -17,13 +17,15 @@ public class PracePage {
     private WebDriver driver;
 
     // IMPORTANT VARIABLES
-    private static final int NUMBER_OF_PAGES_TO_CHECK = 30;
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 15;
     private static final int TIMEOUT_IN_SECS = 5;
 
+    // Basic information
     private static final String BASE_URL = "https://www.prace.cz/nabidky/";
     private static final String WEBSITE_NAME = "prace.cz";
     private static final String SHEETNAME = "COLLECTED_DATA";
 
+    // Filter setup
     private static final String IT_PROFESSION = "IT";
     private static final String POSITIONS_XPATH = "//ul/li[descendant::*[contains(@class,'grid--rev')]" +
             "/div[contains(@class,'grid__item') and descendant::*[contains(@class,'grid')]]]";
@@ -36,7 +38,6 @@ public class PracePage {
     private static final String POSITION_COMPANY_XPATH = "//div[contains(@class,'company')]";
     private static final String POSITION_LINK_XPATH = "//h3/a";
     private static final String SALARY_LABEL_XPATH = "//*[contains(@class,'--salary')]";
-    private static final String HOMEOFFICE_LABEL_XPATH = "//*[contains(@class,'search-list__home-office--label')]";
 
     // Position detail page constants
     private static final String DETAIL_INFO_XPATH = "//div[@class='double-standalone']/dl";
@@ -47,12 +48,8 @@ public class PracePage {
     private static final String EDUCATION_TEXT_CZ = "Vzdělání:";
     private static final String LANGUAGES_TEXT_CZ = "Jazyky:";
     private static final String BENEFITS_TEXT_CZ = "Benefity:";
-    //    private static final String WORK_TAGS_TEXT_CZ = "Zařazeno: ";
     private static final String EMPLOYMENT_FORM_TEXT_CZ = "Pracovní poměr:";
-    //    private static final String CONTRACT_DURATION_TEXT_CZ = "Délka pracovního poměru: ";
     private static final String TYPE_OF_CONTRACT_TEXT_CZ = "Smluvní vztah:";
-    private static final String EMPLOYER_TEXT_CZ = "Firma:";
-    private static final String SUITABLE_FOR_TEXT_CZ = "Vhodné i pro:";
     private static final String SALARY_XPATH = "//h3[contains(@class,'salary')]";
     private static final String EMPLOYER_XPATH = "//dd[contains(@class,'company-name')]//strong";
 
@@ -178,22 +175,13 @@ public class PracePage {
             String salaryValue = getLabelValue(position, SALARY_LABEL_XPATH);
 //            String homeOfficeValue = getLabelValue(position, HOMEOFFICE_LABEL_XPATH);
 
-//            System.out.println(timestamp + "----------------------------------------------------------------------");
-//            System.out.println(positionName);
-//            System.out.println(company);
-//            System.out.println(linkAddress);
-//            System.out.println(salaryValue);
-
-//            ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
-
             // open new tab and create ArrayList with windowHandles
             ((JavascriptExecutor) driver).executeScript("window.open()");
             ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
-//
-//            // open the current position in new tab
-//            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
+
+            // open the current position in new tab
+            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
             openLinkInTab(linkAddress, currentTabs);
-//            System.out.println("----TAB OPENED----");
 
             // get position level and decide what to do with the position
             switch (getPositionLevel(linkAddress)) {
@@ -208,7 +196,7 @@ public class PracePage {
                     // otherwise save basic info to the excel, reading it from different layouts is not an option here
                     // print what info from which position you save
                     System.out.println("Basic info: " + positionName);
-//                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
                     break;
                 case CLOSED:
                     // position is closed and there is nothing we can do
@@ -218,8 +206,6 @@ public class PracePage {
 
             //close the current tab with the position and focus back on the position list page
             closeTabWithPosition(currentTabs);
-//            System.out.println("----------------------------------------------------TAB CLOSED----");
-//            System.out.println();
         }
     }
 
@@ -243,15 +229,7 @@ public class PracePage {
             contactName = getContactInfo(CONTACT_NAME_CLASS);
             contactPhone = getContactInfo(CONTACT_INFO_CLASS);
 
-//            System.out.println("Link: " + link);
-//            System.out.println("Contact name: " + contactName);
-//            System.out.println("Contact phone: " + contactPhone);
-//
-//            // determine which language is used and save the info to variables
-//            switch (determineLanguage(DETAIL_INFO_XPATH)) {
-//
-//                // if the language is CZECH, use CZ text
-//                case "CZECH":
+
                     education = getInformationText(EDUCATION_TEXT_CZ);
                     languages = getInformationText(LANGUAGES_TEXT_CZ);
                     salary = getOtherInfoText(SALARY_XPATH);
@@ -259,38 +237,6 @@ public class PracePage {
                     typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
                     typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
                     authority = getOtherInfoText(EMPLOYER_XPATH);
-
-//            System.out.println("Education: " + education);
-//            System.out.println("Languages: " + languages);
-//            System.out.println("Salary: " + salary);
-//            System.out.println("Benefits: " + benefits);
-//            System.out.println("Type of employment: " + typeOfEmployment);
-//            System.out.println("Type of contract: " + typeOfContract);
-//            System.out.println("Authority: " + authority);
-
-//                    break;
-//
-//                // if the language is ENGLISH, use EN text
-//                case "ENGLISH":
-//                    education = getInformationText(EDUCATION_TEXT_EN);
-//                    languages = getInformationText(LANGUAGES_TEXT_EN);
-//                    salary = getInformationText(SALARY_TEXT_EN);
-//                    benefits = getInformationText(BENEFITS_TEXT_EN);
-//                    typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_EN);
-//                    typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_EN);
-//                    authority = getInformationText(EMPLOYER_TEXT_EN);
-//                    break;
-//                // if the language is UNKNOWN, don't bother and save UNKNOWN only
-//                case "UNKNOWN":
-//                    education = UNKNOWN_LANGUAGE;
-//                    languages = UNKNOWN_LANGUAGE;
-//                    salary = UNKNOWN_LANGUAGE;
-//                    benefits = UNKNOWN_LANGUAGE;
-//                    typeOfEmployment = UNKNOWN_LANGUAGE;
-//                    typeOfContract = UNKNOWN_LANGUAGE;
-//                    authority = UNKNOWN_LANGUAGE;
-//                    break;
-//        }
 
             // write values to Excel
             ExcelWriter(timestamp, positionName, companyValue, link, salary, contactName, contactPhone,
@@ -441,20 +387,6 @@ public class PracePage {
         // same as isElementPresentByXpath - REFACTOR
         return driver.findElements(By.xpath(xpath)).size() > 0;
     }
-
-//    private String getContactInfo(String xpath) {
-//        // create empty string variable
-//        String contactName = "";
-//
-//        //if the element is present
-//        if (isElementPresentByXpath(xpath)) {
-//
-//            // save it's value to variable
-//            contactName = driver.findElement(By.xpath(xpath)).getText();
-//        }
-//
-//        return contactName;
-//    }
 
     private String getContactInfo(String className) {
         //create empty string variable
