@@ -35,21 +35,33 @@ public class ProfesiaCzPage {
     }
 
     public void openPage() {
+        // open the page and maximize the window
         driver.get(BASE_URL);
         driver.manage().window().maximize();
+    }
+
+    public void closeCookiesMessage() {
+        // wait for the page to load
+        new WebDriverWait(driver,5);
+
+        // if the cookies message appears disable it
+        if (driver.findElements(By.cssSelector("button[aria-label='NESOUHLASÍM']")).size() > 0) {
+            driver.findElement(By.cssSelector("button[aria-label='NESOUHLASÍM']")).click();
+        }
     }
 
     public void enterProfessionField() throws InterruptedException {
         // wait for the page to load
         waitForVisibilityOfElement(driver, 5, professionFieldTextbox);
 
-        // type 'IT' into the textbox and hit enter
+        // type 'IT' into the textbox and hit enter to select the IT from the suggested options
         professionFieldTextbox.sendKeys(IT_PROFESSION);
         Thread.sleep(500);
         professionFieldTextbox.sendKeys(Keys.ENTER);
     }
 
     public void selectFullTimeJob() {
+        // find
         WebElement fullTimeCheckbox = jobTypeElement.findElement(By.xpath(FULLTIME_CHECKBOX_XP));
 
         if (!fullTimeCheckbox.isSelected()) {
@@ -58,24 +70,38 @@ public class ProfesiaCzPage {
     }
 
     public void selectOfferLanguage() {
-        WebElement czechBox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers28']"));
-        WebElement slovakCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers29']"));
-        WebElement englishCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers30']"));
-        WebElement germanCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers31']"));
-        WebElement agencyCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers32']"));
+//        WebElement czechBox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers28']"));
+//        WebElement slovakCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers29']"));
+//        WebElement englishCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers30']"));
+//        WebElement germanCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers31']"));
+//        WebElement agencyCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers32']"));
+        WebElement czechBox = inWhatLanguageElement.findElement(By.id("idSearchOffers28"));
+        WebElement slovakCheckbox = inWhatLanguageElement.findElement(By.id("idSearchOffers29"));
+        WebElement englishCheckbox = inWhatLanguageElement.findElement(By.id("idSearchOffers30"));
+        WebElement germanCheckbox = inWhatLanguageElement.findElement(By.id("idSearchOffers31"));
+        WebElement agencyCheckbox = inWhatLanguageElement.findElement(By.id("idSearchOffers32"));
 
+        // if not checked, check it
         if (!czechBox.isSelected()) {
             czechBox.click();
         }
+
+        // if not checked, check it
         if (!slovakCheckbox.isSelected()) {
             slovakCheckbox.click();
         }
+
+        // if not checked, check it
         if (!englishCheckbox.isSelected()) {
             englishCheckbox.click();
         }
+
+        // if not checked, check it
         if (!germanCheckbox.isSelected()) {
             germanCheckbox.click();
         }
+
+        // if checked, uncheck it
         if (agencyCheckbox.isSelected()) {
             agencyCheckbox.click();
         }

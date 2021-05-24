@@ -11,10 +11,11 @@ public class ProfesiaCzTest extends TestBase {
         ProfesiaCzPage profesiaCzPage = new ProfesiaCzPage();
 
         profesiaCzPage.openPage();
+        profesiaCzPage.closeCookiesMessage();
         profesiaCzPage.enterProfessionField();
         profesiaCzPage.selectFullTimeJob();
         profesiaCzPage.selectOfferLanguage();
-        profesiaCzPage.recheckAllInputs();
+//        profesiaCzPage.recheckAllInputs();
         profesiaCzPage.clickSearchButton();
 
 
