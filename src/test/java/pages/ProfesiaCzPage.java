@@ -10,12 +10,27 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
+
 public class ProfesiaCzPage {
     private WebDriver driver;
 
+    // IMPORTANT VARIABLES
     private static final String BASE_URL = "https://www.profesia.cz/search_offers.php";
+    private static final String WEBSITE_NAME = "profesia.cz";
+    private static final String SHEETNAME = "COLLECTED_DATA";
+    private static final String FILE_NAME = "data.xlsx";
+
+    private static final int NUMBER_OF_PAGES_TO_CHECK = 20;
+    private static final int TIMEOUT_IN_SECS = 5;
+
+    // Filter positions page
     private static final String IT_PROFESSION = "IT";
     private static final String FULLTIME_CHECKBOX_XP = "//label[text()[contains(.,'plný úvazek')]]";
+
+    // Page with positions constants
+    private static final String POSITIONS_XPATH = "//li[@class='list-row']";
+    private static final String NEXT_PAGE_BUTTON_CSS = "ul.pagination a.next";
 
     @FindBy(id = "offerCriteriaSuggesterInputId")
     private WebElement professionFieldTextbox;
@@ -28,6 +43,12 @@ public class ProfesiaCzPage {
 
     @FindBy(xpath = "//button[text()='Hledat nabídky']")
     private WebElement searchButton;
+
+    @FindBy(css = "ul.list")
+    private WebElement listElement;
+
+    @FindBy(css = NEXT_PAGE_BUTTON_CSS)
+    private WebElement nextPageButton;
 
     public ProfesiaCzPage() {
         driver = WebDriverSingleton.getInstance().getDriver();
@@ -52,7 +73,7 @@ public class ProfesiaCzPage {
 
     public void enterProfessionField() throws InterruptedException {
         // wait for the page to load
-        waitForVisibilityOfElement(driver, 5, professionFieldTextbox);
+        waitForVisibilityOfElement(driver, professionFieldTextbox);
 
         // type 'IT' into the textbox and hit enter to select the IT from the suggested options
         professionFieldTextbox.sendKeys(IT_PROFESSION);
@@ -70,11 +91,6 @@ public class ProfesiaCzPage {
     }
 
     public void selectOfferLanguage() {
-//        WebElement czechBox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers28']"));
-//        WebElement slovakCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers29']"));
-//        WebElement englishCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers30']"));
-//        WebElement germanCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers31']"));
-//        WebElement agencyCheckbox = inWhatLanguageElement.findElement(By.xpath("//label/input[@id='idSearchOffers32']"));
         WebElement czechBox = inWhatLanguageElement.findElement(By.id("idSearchOffers28"));
         WebElement slovakCheckbox = inWhatLanguageElement.findElement(By.id("idSearchOffers29"));
         WebElement englishCheckbox = inWhatLanguageElement.findElement(By.id("idSearchOffers30"));
@@ -111,13 +127,54 @@ public class ProfesiaCzPage {
         searchButton.click();
     }
 
+    public void savePositionsToExcel() throws IOException {
+        // go through set amount of pages that contain positions
+        // first run = first page containing list of positions, etc.
+        for (int i = 0; i < NUMBER_OF_PAGES_TO_CHECK; i++) {
+            // wait for the page to load
+            waitForVisibilityOfElement(driver, listElement);
+
+            // get amount of positions on the page, on this page, it should be 30
+            int positions_size = listElement.findElements(By.xpath(POSITIONS_XPATH)).size();
+
+            // send positions size to the function
+            // go through the list of positions and save them to excel
+//            getPositionsAndSaveThemToExcel(positions_size);
+            System.out.println(positions_size);
+
+            // if the code reaches the last page or the set limit, break the cycle
+            if (getBreakCondition(i)) break;
+        }
+    }
+
+    private boolean getBreakCondition(int i) {
+        boolean isForwardButtonPresent;
+
+        // check if the forward button is present
+        isForwardButtonPresent = driver.findElements(By.cssSelector(NEXT_PAGE_BUTTON_CSS)).size() > 0;
+
+        // if the button is present
+        if (isForwardButtonPresent && i < NUMBER_OF_PAGES_TO_CHECK - 1) {
+
+            // click the button to go to the next page
+            nextPageButton.click();
+        } else {
+
+            // otherwise return true and break the cycle
+            return true;
+        }
+
+        // return false so that the cycle can repeat
+        return false;
+    }
+
     public void recheckAllInputs() {
 
 
     }
 
-    private void waitForVisibilityOfElement(WebDriver driver, int timeInSecs, WebElement webElement) {
-        new WebDriverWait(driver, timeInSecs)
+    private void waitForVisibilityOfElement(WebDriver driver, WebElement webElement) {
+        new WebDriverWait(driver, TIMEOUT_IN_SECS)
                 .until(ExpectedConditions.visibilityOf(webElement));
     }
 }
