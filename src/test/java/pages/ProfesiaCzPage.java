@@ -32,10 +32,9 @@ public class ProfesiaCzPage {
     private static final String POSITIONS_XPATH = "//li[@class='list-row']";
     private static final String NEXT_PAGE_BUTTON_CSS = "ul.pagination a.next";
     private static final String TIMESTAMP_PATTERN = "dd.MM.yyyy HH:mm";
-    //    private static final String POSITION_NAME_XPATH = "//h3[contains(@class,'title')]";
-//    private static final String POSITION_COMPANY_XPATH = "//div[contains(@class,'company')]";
-//    private static final String POSITION_LINK_XPATH = "//h3/a";
     private static final String POSITION_LINK_CSS = "h2 > a[id]";
+    private static final String POSITION_COMPANY_CSS = ".employer";
+    private static final String SALARY_LABEL_CSS = "a[data-dimension7='Salary label']";
 
     @FindBy(id = "offerCriteriaSuggesterInputId")
     private WebElement professionFieldTextbox;
@@ -171,15 +170,19 @@ public class ProfesiaCzPage {
 
             // get basic information for the position and save it to corresponding variables
             String timestamp = getTimeStamp(TIMESTAMP_PATTERN);
-//            String positionName = getElementText(position, POSITION_NAME_XPATH);
-//            String company = getElementText(position, POSITION_COMPANY_XPATH);
-//            String linkAddress = cropPositionLink(position, POSITION_LINK_XPATH);
+            String positionName = getElementTextCss(position, POSITION_LINK_CSS);
+            String company = getElementTextCss(position, POSITION_COMPANY_CSS);
             String linkAddress = getPositionLinkCss(position, POSITION_LINK_CSS);
-//            String salaryValue = getLabelValue(position, SALARY_LABEL_XPATH);
+            String salaryValue = getLabelValueCss(position, SALARY_LABEL_CSS);
 //            String homeOfficeValue = getLabelValue(position, HOMEOFFICE_LABEL_XPATH);
 
             System.out.println(timestamp);
+            System.out.println(positionName);
             System.out.println(linkAddress);
+            System.out.println(company);
+            System.out.println(salaryValue);
+            System.out.println("-----------------------------------");
+
 
             // open new tab and create ArrayList with windowHandles
 //            ((JavascriptExecutor) driver).executeScript("window.open()");
@@ -256,12 +259,12 @@ public class ProfesiaCzPage {
         return new SimpleDateFormat(pattern).format(new java.util.Date());
     }
 
-    private String getElementText(WebElement parentElement, String xpath) {
-        // return text of the element based on the parentElement and xpath
-        return parentElement.findElement(By.xpath("." + xpath)).getText();
-    }
+//    private String getElementText(WebElement parentElement, String xpath) {
+//        // return text of the element based on the parentElement and xpath
+//        return parentElement.findElement(By.xpath("." + xpath)).getText();
+//    }
 
-    private String getCssElementText(WebElement parentElement, String cssSel) {
+    private String getElementTextCss(WebElement parentElement, String cssSel) {
         // return text of the element based on the parentElement and css selector
         return parentElement.findElement(By.cssSelector(cssSel)).getText();
     }
@@ -280,15 +283,29 @@ public class ProfesiaCzPage {
         return parentElement.findElement(By.cssSelector(cssSel)).getAttribute("href");
     }
 
-    private String getLabelValue(WebElement parentElement, String xpath) {
+//    private String getLabelValue(WebElement parentElement, String xpath) {
+//        // define empty string
+//        String value = "";
+//
+//        // if the element exists
+//        if (parentElement.findElements(By.xpath("." + xpath)).size() > 0) {
+//
+//            // save it's value to the string
+//            value = parentElement.findElement(By.xpath("." + xpath)).getText().trim();
+//        }
+//
+//        return value;
+//    }
+
+    private String getLabelValueCss(WebElement parentElement, String cssSel) {
         // define empty string
         String value = "";
 
         // if the element exists
-        if (parentElement.findElements(By.xpath("." + xpath)).size() > 0) {
+        if (parentElement.findElements(By.cssSelector(cssSel)).size() > 0) {
 
             // save it's value to the string
-            value = parentElement.findElement(By.xpath("." + xpath)).getText().trim();
+            value = parentElement.findElement(By.cssSelector(cssSel)).getText().trim();
         }
 
         return value;
