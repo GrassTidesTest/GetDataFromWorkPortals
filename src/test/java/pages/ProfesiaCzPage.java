@@ -1,6 +1,7 @@
 package pages;
 
 import base.WebDriverSingleton;
+import helpers.ExcelEditor;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -191,7 +192,7 @@ public class ProfesiaCzPage {
 //            // open the current position in new tab
 //            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
 //            openLinkInTab(linkAddress, currentTabs);
-//
+
 //            // get position level and decide what to do with the position
 //            switch (getPositionLevel(linkAddress)) {
 //                case BASIC:
@@ -205,7 +206,7 @@ public class ProfesiaCzPage {
 //                    // otherwise save basic info to the excel, reading it from different layouts is not an option here
 //                    // print what info from which position you save
 //                    System.out.println("Basic info: " + positionName);
-//                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
+                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
 //                    break;
 //                case CLOSED:
 //                    // position is closed and there is nothing we can do
@@ -325,5 +326,21 @@ public class ProfesiaCzPage {
 
         // change back to main windows
         driver.switchTo().window(tabs.get(0));
+    }
+
+    // Calling ExcelEditor to write data to the excel file
+    private void ExcelWriter(String timestamp, String positionName, String company,
+                             String link, String salary) throws IOException {
+
+        //Create an array with the data in the same order in which you expect to be filled in excel file
+        String[] valueToWrite = {timestamp, ProfesiaCzPage.WEBSITE_NAME, positionName, company, link, salary, "",
+                "NO", "", "", "", "", "", "", "", "", ""};
+
+        //Create an object of current class
+        ExcelEditor objExcelFile = new ExcelEditor();
+
+        //Write the file using file name, sheet name and the data to be filled
+        objExcelFile.WriteToExcel(System.getProperty("user.dir") + "\\src\\test\\resources",
+                base.TestBase.FILE_NAME, ProfesiaCzPage.SHEETNAME, valueToWrite);
     }
 }
