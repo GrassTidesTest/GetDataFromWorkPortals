@@ -43,4 +43,54 @@ public class ZZZ_playgroundPage {
 
         System.out.println("Nezavirej");
     }
+
+    public void testFunctionForStringManipulation() {
+
+        String[] contactInfo = getContactInformation(ORIGINAL_STRING);
+
+        System.out.println("person: " + contactInfo[0]);
+        System.out.println("phone: " + contactInfo[1]);
+        System.out.println("email: " + contactInfo[2]);
+
+
+    }
+
+
+    private static final String ORIGINAL_STRING =
+            "Kontaktní osoba: Ing. Lukáš Benedikt\n" +
+            "Tel.: 02 654 40 421-102\n" +
+            "E-mail: poslat životopis";
+//            "E-mail: jsem@super.cz";
+
+    private String[] getContactInformation(String originalString) {
+        // split original string to an array
+        String[] originalStrings = originalString.split("\n");
+
+        // declare new string array with three elements
+        String[] strings = new String[3];
+
+        // iterate through originalStrings
+        for (String string : originalStrings) {
+
+            // manipulate string and get only the information you desire
+            String substring = string.substring(string.indexOf(":") + 2);
+
+            // if string contains "Kontaktní osoba" it's contact name = strings[0]
+            if (string.contains("Kontaktní osoba")) {
+                strings[0] = substring;
+            }
+
+            // if string contains "Tel." it's contact phone = strings[1]
+            if (string.contains("Tel.")) {
+                strings[1] = substring;
+            }
+
+            // if string contains "Email" and not "životopis" it's contact email = strings[2]
+            if (string.contains("E-mail") && !string.contains("životopis")){
+                strings[2] = substring;
+            }
+        }
+
+        return strings;
+    }
 }
