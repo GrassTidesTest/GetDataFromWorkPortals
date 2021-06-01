@@ -2,12 +2,14 @@ package pages;
 
 import base.WebDriverSingleton;
 import helpers.ExcelEditor;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -95,6 +97,7 @@ public class ProfesiaCzPage {
         // type 'IT' into the textbox and hit enter to select the IT from the suggested options
         professionFieldTextbox.sendKeys(IT_PROFESSION);
         Thread.sleep(500);
+        professionFieldTextbox.sendKeys(Keys.ARROW_UP);
         professionFieldTextbox.sendKeys(Keys.ENTER);
     }
 
@@ -145,7 +148,7 @@ public class ProfesiaCzPage {
         searchButton.click();
     }
 
-    public void savePositionsToExcel() throws IOException {
+    public void savePositionsToExcel() throws IOException, InterruptedException {
         // go through set amount of pages that contain positions
         // first run = first page containing list of positions, etc.
         for (int i = 0; i < NUMBER_OF_PAGES_TO_CHECK; i++) {
@@ -165,7 +168,7 @@ public class ProfesiaCzPage {
         }
     }
 
-    private void getPositionsAndSaveThemToExcel(int positions_size) throws IOException {
+    private void getPositionsAndSaveThemToExcel(int positions_size) throws IOException, InterruptedException {
 
         // go through the list of positions and for each position determine
         // if the basic info or detail info will be saved to the excel
@@ -186,14 +189,6 @@ public class ProfesiaCzPage {
             String linkAddress = getPositionLinkCss(position, POSITION_LINK_CSS);
             String salaryValue = getLabelValueCss(position, SALARY_LABEL_CSS);
 
-            System.out.println(timestamp);
-            System.out.println(positionName);
-            System.out.println(linkAddress);
-            System.out.println(company);
-            System.out.println(salaryValue);
-            System.out.println("----------------------------");
-
-
             // open new tab and create ArrayList with windowHandles
             ((JavascriptExecutor) driver).executeScript("window.open()");
             ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
@@ -209,7 +204,7 @@ public class ProfesiaCzPage {
 //                    // get the detailed information from the page for BASIC and MEDIUM
 //                    // print what info from which position you save
 //                    System.out.println("Detail info: " + positionName);
-            getDetailedInformation(timestamp, positionName, company, linkAddress);
+//            getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue);
 //                    break;
 //                case ADVANCED:
 //                    // otherwise save basic info to the excel, reading it from different layouts is not an option here
@@ -223,6 +218,12 @@ public class ProfesiaCzPage {
 //            }
 //
             // close the current tab with the position and focus back on the position list page
+            if (isDetailedInfo()) {
+                getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue);
+            } else {
+                ExcelWriter_basic(timestamp, positionName, company, linkAddress, salaryValue);
+            }
+
             closeTabWithPosition(currentTabs);
         }
     }
@@ -249,32 +250,64 @@ public class ProfesiaCzPage {
         return false;
     }
 
-    private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link)
-            throws IOException {
+    private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link,
+                                        String salaryValue) throws IOException {
+        String contactName, contactPhoneMail, typeOfEmployment;
 
-        String[] contactInfo;
-        String typeOfEmployment = "";
+        contactName = contactPhoneMail = typeOfEmployment = "";
+
+        String[] contactInfo = new String[3];
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, positionMainElement);
+
 
         if (driver.findElements(By.cssSelector(EMPLOYMENT_TYPE_CSS)).size() > 0) {
             typeOfEmployment = driver.findElement(By.cssSelector(EMPLOYMENT_TYPE_CSS)).getText();
         }
 
-        System.out.println("Employment type: " + typeOfEmployment);
-
-
         if (driver.findElements(By.xpath(POSITION_CONTACT_ELEMENT_XP)).size() > 0) {
             contactInfo = getContactInformation(contactElement.getText());
 
-            System.out.println("Contact name: " + contactInfo[0]);
-            System.out.println("Contact phone: " + contactInfo[1]);
-            System.out.println("Contact mail: " + contactInfo[2]);
+            contactName = contactInfo[0];
+
+            // maybe try stream? i think it should help
+            if (!contactInfo[1].isEmpty() && !contactInfo[2].isEmpty()) {
+
+                contactPhoneMail = contactInfo[2] + ", " + contactInfo[1];
+
+            } else if (contactInfo[1].isEmpty() && !contactInfo[2].isEmpty()) {
+
+                contactPhoneMail = contactInfo[2];
+
+            } else if (!contactInfo[1].isEmpty()) {
+
+                contactPhoneMail = contactInfo[1];
+
+            }
+
         } else {
-            System.out.println("NO CONTACT INFO");
+            contactName = contactPhoneMail = "";
         }
+
+        System.out.println(timestamp);
+        System.out.println(positionName);
+        System.out.println(link);
+        System.out.println(companyValue);
+        System.out.println(salaryValue);
+        System.out.println("----------------------------");
+        System.out.println(typeOfEmployment);
+        System.out.println(contactName);
+        System.out.println(contactPhoneMail);
         System.out.println("------------------------------------------------------------------------------------");
+
+        // write values to Excel
+        ExcelWriter_detailed(timestamp, positionName, companyValue, link, salaryValue, contactName, contactPhoneMail,
+                typeOfEmployment);
+
+        //(String timestamp, String positionName, String company,
+        //                             String link, String salary, String contactPerson, String contactPhoneMail,
+        //                             String typeOfEmployment)
 
 
         // make sure the element exists before taking the info out of it
@@ -319,10 +352,6 @@ public class ProfesiaCzPage {
 //                    authority = UNKNOWN_LANGUAGE;
 //                    break;
 //            }
-
-        // write values to Excel
-//            ExcelWriter(timestamp, positionName, companyValue, link, salary, homeOfficeValue, contactName, contactPhone,
-//                    education, languages, salary, benefits, typeOfEmployment, typeOfContract, authority);
 //        } else {
 //            System.out.println("this should not happen - it means that the position was determined as detailed " +
 //                    "but the detailed info is not on the page (possibly operator changed the code of the page)");
@@ -361,6 +390,18 @@ public class ProfesiaCzPage {
         return strings;
     }
 
+    private boolean isDetailedInfo() {
+
+        // true if the employment element is present
+        boolean isEmploymentPresent = driver.findElements(By.cssSelector(EMPLOYMENT_TYPE_CSS)).size() > 0;
+
+        // true if the contact element is present
+        boolean isContactPresent = driver.findElements(By.xpath(POSITION_CONTACT_ELEMENT_XP)).size() > 0;
+
+        // if no detailed info is present, returns false
+        return isEmploymentPresent || isContactPresent;
+    }
+
 
     public void recheckAllInputs() {
 
@@ -387,9 +428,23 @@ public class ProfesiaCzPage {
 //        return parentElement.findElement(By.xpath("." + xpath)).getText();
 //    }
 
-    private String getElementTextCss(WebElement parentElement, String cssSel) {
+    private String getElementTextCss(WebElement parentElement, String cssSel) throws InterruptedException, IOException {
+        String text = "";
+
+        try {
+            text = parentElement.findElement(By.cssSelector(cssSel)).getText();
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", parentElement);
+            Thread.sleep(2);
+            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            FileUtils.copyFile(screenshot, new File("C:/h2a_failed.png"));
+        }
+
+
         // return text of the element based on the parentElement and css selector
-        return parentElement.findElement(By.cssSelector(cssSel)).getText();
+//        return parentElement.findElement(By.cssSelector(cssSel)).getText();
+
+        return text;
     }
 
     private String cropPositionLink(WebElement parentElement, String xpath) {
@@ -451,8 +506,25 @@ public class ProfesiaCzPage {
     }
 
     // Calling ExcelEditor to write data to the excel file
-    private void ExcelWriter(String timestamp, String positionName, String company,
-                             String link, String salary) throws IOException {
+    private void ExcelWriter_detailed(String timestamp, String positionName, String company,
+                                      String link, String salary, String contactPerson, String contactPhoneMail,
+                                      String typeOfEmployment) throws IOException {
+
+        //Create an array with the data in the same order in which you expect to be filled in excel file
+        String[] valueToWrite = {timestamp, ProfesiaCzPage.WEBSITE_NAME, positionName, company, link, salary, "",
+                "YES", contactPerson, contactPhoneMail, "", "", "", "", typeOfEmployment, "", ""};
+
+        //Create an object of current class
+        ExcelEditor objExcelFile = new ExcelEditor();
+
+        //Write the file using file name, sheet name and the data to be filled
+        objExcelFile.WriteToExcel(System.getProperty("user.dir") + "\\src\\test\\resources",
+                base.TestBase.FILE_NAME, ProfesiaCzPage.SHEETNAME, valueToWrite);
+    }
+
+    // Calling ExcelEditor to write data to the excel file
+    private void ExcelWriter_basic(String timestamp, String positionName, String company,
+                                   String link, String salary) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, ProfesiaCzPage.WEBSITE_NAME, positionName, company, link, salary, "",
