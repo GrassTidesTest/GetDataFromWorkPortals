@@ -197,37 +197,17 @@ public class ProfesiaCzPage {
             // by doing this we avoid getting stuck by some aggressive popups when closing the position page
             openLinkInTab(linkAddress, currentTabs);
 
-//            // get position level and decide what to do with the position
-//            switch (getPositionLevel(linkAddress)) {
-//                case BASIC:
-//                case MEDIUM:
-//                    // get the detailed information from the page for BASIC and MEDIUM
-//                    // print what info from which position you save
-//                    System.out.println("Detail info: " + positionName);
-//            getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue);
-//                    break;
-//                case ADVANCED:
-//                    // otherwise save basic info to the excel, reading it from different layouts is not an option here
-//                    // print what info from which position you save
-//                    System.out.println("Basic info: " + positionName);
-//                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue);
-//                    break;
-//                case CLOSED:
-//                    // position is closed and there is nothing we can do
-//                    System.out.println("Closed: " + positionName);
-//            }
-//
-            // close the current tab with the position and focus back on the position list page
+            // check if the detailed information is present, if not save basic info to excel
             if (isDetailedInfo()) {
                 getDetailedInformation(timestamp, positionName, company, linkAddress, salaryValue);
             } else {
                 ExcelWriter_basic(timestamp, positionName, company, linkAddress, salaryValue);
+                System.out.println("Basic info: " + positionName);
             }
 
             closeTabWithPosition(currentTabs);
         }
     }
-
 
     private boolean getBreakCondition(int i) {
         boolean isForwardButtonPresent;
@@ -252,110 +232,34 @@ public class ProfesiaCzPage {
 
     private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link,
                                         String salaryValue) throws IOException {
+
         String contactName, contactPhoneMail, typeOfEmployment;
-
         contactName = contactPhoneMail = typeOfEmployment = "";
-
-        String[] contactInfo = new String[3];
 
         // wait for the page to load
         waitForVisibilityOfElement(driver, positionMainElement);
 
-
+        // if employment type is present, get text
         if (driver.findElements(By.cssSelector(EMPLOYMENT_TYPE_CSS)).size() > 0) {
             typeOfEmployment = driver.findElement(By.cssSelector(EMPLOYMENT_TYPE_CSS)).getText();
         }
 
+        // if contact is present, get text and edit
         if (driver.findElements(By.xpath(POSITION_CONTACT_ELEMENT_XP)).size() > 0) {
-            contactInfo = getContactInformation(contactElement.getText());
+
+            // [0] = name, [1] = phone, [2] = email
+            String[] contactInfo = getContactInformation(contactElement.getText());
 
             contactName = contactInfo[0];
 
-            // maybe try stream? i think it should help
-            if (!contactInfo[1].isEmpty() && !contactInfo[2].isEmpty()) {
-
-                contactPhoneMail = contactInfo[2] + ", " + contactInfo[1];
-
-            } else if (contactInfo[1].isEmpty() && !contactInfo[2].isEmpty()) {
-
-                contactPhoneMail = contactInfo[2];
-
-            } else if (!contactInfo[1].isEmpty()) {
-
-                contactPhoneMail = contactInfo[1];
-
-            }
-
-        } else {
-            contactName = contactPhoneMail = "";
+            contactPhoneMail = contactInfo[2] + ", " + contactInfo[1];
         }
-
-        System.out.println(timestamp);
-        System.out.println(positionName);
-        System.out.println(link);
-        System.out.println(companyValue);
-        System.out.println(salaryValue);
-        System.out.println("----------------------------");
-        System.out.println(typeOfEmployment);
-        System.out.println(contactName);
-        System.out.println(contactPhoneMail);
-        System.out.println("------------------------------------------------------------------------------------");
 
         // write values to Excel
         ExcelWriter_detailed(timestamp, positionName, companyValue, link, salaryValue, contactName, contactPhoneMail,
                 typeOfEmployment);
 
-        //(String timestamp, String positionName, String company,
-        //                             String link, String salary, String contactPerson, String contactPhoneMail,
-        //                             String typeOfEmployment)
-
-
-        // make sure the element exists before taking the info out of it
-//        if (doesElementExist(DETAIL_INFO_XPATH)) {
-
-        // get contact name and phone information
-//            contactName = getContactInfo(CONTACT_NAME_XPATH);
-//            contactPhone = getContactInfo(CONTACT_INFO_XPATH);
-
-        // determine which language is used and save the info to variables
-//            switch (determineLanguage(DETAIL_INFO_XPATH)) {
-
-        // if the language is CZECH, use CZ text
-//                case "CZECH":
-//                    education = getInformationText(EDUCATION_TEXT_CZ);
-//                    languages = getInformationText(LANGUAGES_TEXT_CZ);
-//                    salary = getInformationText(SALARY_TEXT_CZ);
-//                    benefits = getInformationText(BENEFITS_TEXT_CZ);
-//                    typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_CZ);
-//                    typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_CZ);
-//                    authority = getInformationText(EMPLOYER_TEXT_CZ);
-//                    break;
-
-        // if the language is ENGLISH, use EN text
-//                case "ENGLISH":
-//                    education = getInformationText(EDUCATION_TEXT_EN);
-//                    languages = getInformationText(LANGUAGES_TEXT_EN);
-//                    salary = getInformationText(SALARY_TEXT_EN);
-//                    benefits = getInformationText(BENEFITS_TEXT_EN);
-//                    typeOfEmployment = getInformationText(EMPLOYMENT_FORM_TEXT_EN);
-//                    typeOfContract = getInformationText(TYPE_OF_CONTRACT_TEXT_EN);
-//                    authority = getInformationText(EMPLOYER_TEXT_EN);
-//                    break;
-        // if the language is UNKNOWN, don't bother and save UNKNOWN only
-//                case "UNKNOWN":
-//                    education = UNKNOWN_LANGUAGE;
-//                    languages = UNKNOWN_LANGUAGE;
-//                    salary = UNKNOWN_LANGUAGE;
-//                    benefits = UNKNOWN_LANGUAGE;
-//                    typeOfEmployment = UNKNOWN_LANGUAGE;
-//                    typeOfContract = UNKNOWN_LANGUAGE;
-//                    authority = UNKNOWN_LANGUAGE;
-//                    break;
-//            }
-//        } else {
-//            System.out.println("this should not happen - it means that the position was determined as detailed " +
-//                    "but the detailed info is not on the page (possibly operator changed the code of the page)");
-//        }
+        System.out.println("Detailed info: " + positionName);
     }
 
     private String[] getContactInformation(String originalString) {
