@@ -93,4 +93,11 @@ public class ZZZ_playgroundPage {
 
         return strings;
     }
+
+    public void isEmptyStringEmpty() {
+        String x = null;
+
+        System.out.println("empty:" + x.isEmpty());
+        System.out.println("blank:" + x.isBlank());
+    }
 }

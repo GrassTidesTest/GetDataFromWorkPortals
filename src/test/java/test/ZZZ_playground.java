@@ -11,6 +11,8 @@ public class ZZZ_playground {
         ZZZ_playgroundPage zzz_playgroundPage = new ZZZ_playgroundPage();
 
 //        zzz_playgroundPage.useClassSelector();
-        zzz_playgroundPage.testFunctionForStringManipulation();
+//        zzz_playgroundPage.testFunctionForStringManipulation();
+        zzz_playgroundPage.isEmptyStringEmpty();
+
     }
 }
