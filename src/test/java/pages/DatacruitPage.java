@@ -28,14 +28,7 @@ public class DatacruitPage {
     private static final String SHEETNAME = "COLLECTED_DATA";
 
     // Search form constants
-//    private static final String ISIT_KONZULTACE = "IS/IT: Konzultace, analýzy a projektové řízení";
-//    private static final String ISIT_SPRAVA = "IS/IT: Správa systémů a HW";
-//    private static final String ISIT_VYVOJ = "IS/IT: Vývoj aplikací a systémů";
-//    private static final String SEARCH_BUTTON_TEXT = "Hledat";
-//    private static final String POSITIONS_XPATH = "//div[contains(@class,'standalone search-list__item') and @data-position-id]";
     private static final String NEXT_PAGE_BUTTON_CSS = "#snippet--loadMore a.btn";
-    //    private static final String SALARY_LABEL_XPATH = "//*[contains(@class,'label--success')]";
-//    private static final String HOMEOFFICE_LABEL_XPATH = "//*[contains(@class,'search-list__home-office--label')]";
     private static final String CZECH_REP_DROPDOWN_ITEM = "//a[text()='Česká republika']";
     private static final String SLOVAKIA_DROPDOWN_ITEM = "//a[text()='Slovensko']";
 
@@ -44,6 +37,7 @@ public class DatacruitPage {
 //    private static final String POSITION_NAME_XPATH = "//h3[contains(@class,'title')]";
 //    private static final String POSITION_COMPANY_XPATH = "//div[contains(@class,'company')]";
 //    private static final String POSITION_LINK_XPATH = "//h3/a";
+    private static final String POSITION_LINK_CSS = "a.jobCard";
 
     // Position detail page constants
 //    private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
@@ -117,9 +111,9 @@ public class DatacruitPage {
         waitForVisibilityOfElement(driver, typeOfWorkResult);
 
         // select "Živnostenský list"
-        typeOfWorkResult.findElement(By.xpath("//*[contains(@id,'contractor')]")).click();
+        typeOfWorkResult.findElement(By.xpath(".//*[contains(@id,'contractor')]")).click();
 
-        clickSearchButton();
+//        clickSearchButton();
     }
 
     public void clickSearchButton() {
@@ -138,7 +132,7 @@ public class DatacruitPage {
             waitForVisibilityOfElement(driver, contentWrapper);
 
             // get amount of positions on the page, on this page, it should be 30
-            int positions_size = contentWrapper.findElements(By.xpath("." + "/a")).size();
+            int positions_size = contentWrapper.findElements(By.cssSelector(POSITION_LINK_CSS)).size();
 
             // send positions size to the function
             // go through the list of positions and save them to excel
