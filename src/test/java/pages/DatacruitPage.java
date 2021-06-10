@@ -2,6 +2,7 @@ package pages;
 
 import base.WebDriverSingleton;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -10,6 +11,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
+import java.util.List;
 
 public class DatacruitPage {
     private final WebDriver driver;
@@ -28,7 +30,8 @@ public class DatacruitPage {
     private static final String SHEETNAME = "COLLECTED_DATA";
 
     // Search form constants
-    private static final String NEXT_PAGE_BUTTON_CSS = "#snippet--loadMore a.btn";
+//    private static final String NEXT_PAGE_BUTTON_CSS = "#snippet--loadMore a.btn";
+    private static final String NEXT_PAGE_BUTTON_CSS = "a.pagination__item--arrow";
     private static final String CZECH_REP_DROPDOWN_ITEM = "//a[text()='Česká republika']";
     private static final String SLOVAKIA_DROPDOWN_ITEM = "//a[text()='Slovensko']";
 
@@ -65,8 +68,9 @@ public class DatacruitPage {
     @FindBy(id = "snippet--list")
     private WebElement contentWrapper;
 
-    @FindBy(css = ".paginationBox a.btn")
-    private WebElement nextPageButton;
+//    @FindBy(css = ".paginationBox a.btn")
+//    @FindBy(css = NEXT_PAGE_BUTTON_CSS)
+//    private WebElement nextPageButton;
 
     // methods for setting up the search
     public DatacruitPage() {
@@ -129,7 +133,7 @@ public class DatacruitPage {
         // first run = first page containing list of positions, etc.
         for (int i = 0; i < NUMBER_OF_PAGES_TO_CHECK; i++) {
             // wait for the page to load
-            waitForVisibilityOfElement(driver, contentWrapper);
+            waitForElementToBeClickable(driver, contentWrapper);
 
             // get amount of positions on the page, on this page, it should be 30
             int positions_size = contentWrapper.findElements(By.cssSelector(POSITION_LINK_CSS)).size();
@@ -145,15 +149,22 @@ public class DatacruitPage {
     }
 
     private boolean getBreakCondition(int i) {
-        boolean isForwardButtonPresent;
 
         // check if the forward button is present
-        isForwardButtonPresent = driver.findElements(By.cssSelector(NEXT_PAGE_BUTTON_CSS)).size() > 0;
+        List<WebElement> nextPageButtons = driver.findElements(By.cssSelector(NEXT_PAGE_BUTTON_CSS));
+        WebElement nextPageButton;
 
         // if the button is present
-        if (isForwardButtonPresent && i < NUMBER_OF_PAGES_TO_CHECK - 1) {
+        if (nextPageButtons.size() > 0 && i < NUMBER_OF_PAGES_TO_CHECK - 1) {
+
+            if (nextPageButtons.size() == 2) {
+                nextPageButton = nextPageButtons.get(1);
+            } else {
+                nextPageButton = nextPageButtons.get(0);
+            }
 
             // click the button to go to the next page
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", nextPageButton);
             nextPageButton.click();
         } else {
 
