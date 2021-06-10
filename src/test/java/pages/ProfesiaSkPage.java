@@ -29,7 +29,10 @@ public class ProfesiaSkPage {
     // Filter positions page
     private static final String IT_PROFESSION = "IT";
     private static final String FULLTIME_CHECKBOX_XP = "//label[text()[contains(.,'plný úväzok')]]";
-    private static final String COOKIES_BTN_CSS = "button[aria-label='NESÚHLASÍM']";
+    private static final String COOKIES_MESSAGE_CSS = "#qc-cmp2-ui";
+    private static final String COOKIES_SETTINGS_CSS = "button[aria-label='VIAC MOŽNOSTÍ']";
+    private static final String COOKIES_DECLINE_CSS = "button[aria-label='ODMIETNUŤ VŠETKO']";
+    private static final String COOKIES_SAVE_LEAVE_XP = "//div[contains(@class,'desktop')]/button[contains(@aria-label,'ULOŽIŤ A ZATVORIŤ')]";
 
     // Page with positions
     private static final String POSITIONS_XPATH = "//li[@class='list-row']";
@@ -82,12 +85,22 @@ public class ProfesiaSkPage {
     public void closeCookiesMessage() {
         WebDriverWait wait = new WebDriverWait(driver, TIMEOUT_IN_SECS);
 
-        // wait for the page to load
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(COOKIES_BTN_CSS)));
+        try {
+            // wait for the page to load
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(COOKIES_MESSAGE_CSS)));
+            System.out.println("Cookie message present");
+
+        } catch (Exception e) {
+            // do nothing and carry on as the cookie message just hasn't showed up
+            System.out.println("Cookie message not present");
+        }
 
         // if the cookies message appears disable it
-        if (driver.findElements(By.cssSelector(COOKIES_BTN_CSS)).size() > 0) {
-            driver.findElement(By.cssSelector(COOKIES_BTN_CSS)).click();
+        if (driver.findElements(By.cssSelector(COOKIES_MESSAGE_CSS)).size() > 0) {
+            driver.findElement(By.cssSelector(COOKIES_SETTINGS_CSS)).click();
+
+            driver.findElement(By.cssSelector(COOKIES_DECLINE_CSS)).click();
+            driver.findElement(By.xpath(COOKIES_SAVE_LEAVE_XP)).click();
         }
     }
 
