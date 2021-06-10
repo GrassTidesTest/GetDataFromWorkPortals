@@ -30,6 +30,11 @@ public class ProfesiaCzPage {
     private static final String IT_PROFESSION = "IT";
     private static final String FULLTIME_CHECKBOX_XP = "//label[text()[contains(.,'plný úvazek')]]";
     private static final String COOKIES_BTN_CSS = "button[aria-label='NESOUHLASÍM']";
+    //    private static final String COOKIES_BTN_CSS = "button[aria-label='NESOUHLASÍM']";
+    private static final String COOKIES_MESSAGE_CSS = "#qc-cmp2-ui";
+    private static final String COOKIES_SETTINGS_CSS = "button[aria-label='VÍCE MOŽNOSTÍ']";
+    private static final String COOKIES_DECLINE_CSS = "button[aria-label='ODMÍTÁM VŠE']";
+    private static final String COOKIES_SAVE_LEAVE_XP = "//div[contains(@class,'desktop')]/button[contains(@aria-label,'ODEJÍT')]";
 
     // Page with positions constants
     private static final String POSITIONS_XPATH = "//li[@class='list-row']";
