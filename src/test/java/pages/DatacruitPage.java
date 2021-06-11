@@ -111,19 +111,18 @@ public class DatacruitPage {
         waitForElementToBeClickable(driver, typeOfWorkInput);
 
         //try this wait instead
-//        waitUntilSomething();
         waitUntilPageLoaded(driver);
 
         // click on dropdown
         typeOfWorkInput.click();
 
-        waitForVisibilityOfElement(driver, typeOfWorkResult);
+//        waitForVisibilityOfElement(driver, typeOfWorkResult);
 
         // select "Živnostenský list"
         typeOfWorkResult.findElement(By.xpath("." + "//*[contains(@id,'contractor')]")).click();
 
-        waitForElementToBeClickable(driver, searchButton);
-        waitUntilPageLoaded(driver);
+//        waitForElementToBeClickable(driver, searchButton);
+//        waitUntilPageLoaded(driver);
     }
 
     public void clickSearchButton() {
@@ -189,7 +188,6 @@ public class DatacruitPage {
             // i = 1, means it's the first position from the list etc.
             WebElement position = driver.findElement(By.xpath(POSITIONS_XPATH + "[" + i + "]"));
 
-
             // get basic information for the position and save it to corresponding variables
             String timestamp = getTimeStamp(TIMESTAMP_PATTERN);
             String positionName = getElementText(position, POSITION_NAME_XPATH);
@@ -207,13 +205,13 @@ public class DatacruitPage {
 //            System.out.println(homeOfficeValue);
             System.out.println("----------------------------------------------------------");
 
-//            // open new tab and create ArrayList with windowHandles
-//            ((JavascriptExecutor) driver).executeScript("window.open()");
-//            ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
-//
-//            // open the current position in new tab
-//            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
-//            openLinkInTab(linkAddress, currentTabs);
+            // open new tab and create ArrayList with windowHandles
+            ((JavascriptExecutor) driver).executeScript("window.open()");
+            ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
+
+            // open the current position in new tab
+            // by doing this we avoid getting stuck by some aggressive popups when closing the position page
+            openLinkInTab(linkAddress, currentTabs);
 //
 //            // get position level and decide what to do with the position
 //            switch (getPositionLevel(linkAddress)) {
@@ -235,8 +233,8 @@ public class DatacruitPage {
 //                    System.out.println("Closed: " + positionName);
 //            }
 //
-//            //close the current tab with the position and focus back on the position list page
-//            closeTabWithPosition(currentTabs);
+            //close the current tab with the position and focus back on the position list page
+            closeTabWithPosition(currentTabs);
         }
     }
 
