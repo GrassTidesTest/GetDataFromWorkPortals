@@ -9,7 +9,7 @@ import java.io.IOException;
 public class DatacruitTest extends TestBase {
 
     @Test
-    public void getDataFromDatacruitPage() throws IOException {
+    public void getDataFromDatacruitPage() throws IOException, InterruptedException {
         DatacruitPage datacruitPage = new DatacruitPage();
 
         datacruitPage.openPage();
