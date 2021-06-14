@@ -46,7 +46,6 @@ public class DatacruitPage {
     private static final String POSITIONS_XPATH = "//*[@id='snippet--list']/a";
 
     // Position detail page constants
-//    private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
     private static final String DETAIL_INFO_CSS = ".jobDetail__params";
     private static final String DETAIL_COMPANY_XPATH = "//img[contains(@src,'building')]/ancestor::*[self::li]";
     private static final String DETAIL_LOCATION_XPATH = "//img[contains(@src,'map')]/ancestor::*[self::li]";
@@ -191,14 +190,6 @@ public class DatacruitPage {
             String positionName = getElementText(position, POSITION_NAME_XPATH);
             String company = getElementText(position, POSITION_COMPANY_XPATH);
             String linkAddress = getLinkUrl(position);
-            String salaryValue = getElementText(position, POSITION_SALARY_XPATH);
-
-//            System.out.println(timestamp);
-//            System.out.println("Position: " + positionName);
-//            System.out.println("Company: " + company);
-//            System.out.println("Link: " + linkAddress);
-//            System.out.println("Salary: " + salaryValue);
-//            System.out.println("----------------------------------------------------------");
 
             // open new tab and create ArrayList with windowHandles
             ((JavascriptExecutor) driver).executeScript("window.open()");
@@ -300,9 +291,9 @@ public class DatacruitPage {
             // return text of the element based on the parentElement and xpath
             return parentElement.findElement(By.xpath("." + xpath)).getText();
         } catch (Exception e) {
-            System.out.println("Error here: " + e);
+            System.out.println("Error occurred getting the element text: " + e);
         }
-        return "Error occurred";
+        return "Error occurred getting the text";
     }
 
     private void openLinkInTab(String positionLink, ArrayList<String> tabs) {
