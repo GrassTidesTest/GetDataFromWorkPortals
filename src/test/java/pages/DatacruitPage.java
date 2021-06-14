@@ -47,8 +47,14 @@ public class DatacruitPage {
 
     // Position detail page constants
 //    private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
-//    private static final String CONTACT_NAME_XPATH = "//span[@itemprop='name']/a";
-//    private static final String CONTACT_INFO_XPATH = "//span[@itemprop='telephone']";
+    private static final String DETAIL_INFO_CSS = ".jobDetail__params";
+    private static final String DETAIL_COMPANY_XPATH = "//img[contains(@src,'building')]/ancestor::*[self::li]";
+    private static final String DETAIL_LOCATION_XPATH = "//img[contains(@src,'map')]/ancestor::*[self::li]";
+    private static final String DETAIL_TYPE_OF_EMPLOYMENT_XPATH = "//img[contains(@src,'briefcase')]/ancestor::*[self::li]";
+    private static final String DETAIL_LANGUAGE_XPATH = "//img[contains(@src,'language')]/ancestor::*[self::li]";
+    private static final String DETAIL_SALARY_XPATH = "//img[contains(@src,'money')]/ancestor::*[self::li]";
+    private static final String DETAIL_HOMEOFFICE_XPATH = "//img[contains(@src,'house')]/ancestor::*[self::li]";
+    private static final String DETAIL_EDUCATION_XPATH = "//img[contains(@src,'education')]/ancestor::*[self::li]";
 
     // Search form
     @FindBy(css = ".treeSelect__preview-search input")
@@ -63,13 +69,17 @@ public class DatacruitPage {
     @FindBy(name = "send")
     private WebElement searchButton;
 
+    // Positions list
     @FindBy(id = "snippet--list")
     private WebElement contentWrapper;
 
     @FindBy(xpath = NEXT_PAGE_BUTTON_XP)
     private WebElement nextPageButton;
 
-    // methods for setting up the search
+    // Position detail page
+    @FindBy(css = DETAIL_INFO_CSS)
+    private WebElement detailInfoElement;
+
     public DatacruitPage() {
         driver = WebDriverSingleton.getInstance().getDriver();
         PageFactory.initElements(driver, this);
@@ -190,9 +200,6 @@ public class DatacruitPage {
 //            System.out.println("Salary: " + salaryValue);
 //            System.out.println("----------------------------------------------------------");
 
-            ExcelWriter_basic(timestamp, positionName, company, linkAddress, salaryValue);
-            System.out.println("Basic info: " + positionName);
-
             // open new tab and create ArrayList with windowHandles
             ((JavascriptExecutor) driver).executeScript("window.open()");
             ArrayList<String> currentTabs = new ArrayList<String>(driver.getWindowHandles());
@@ -201,11 +208,63 @@ public class DatacruitPage {
             // by doing this we avoid getting stuck by some aggressive popups when closing the position page
             openLinkInTab(linkAddress, currentTabs);
 
+            getDetailedInformation(timestamp, positionName, company, linkAddress);
+
             //close the current tab with the position and focus back on the position list page
             closeTabWithPosition(currentTabs);
         }
     }
 
+    private void getDetailedInformation(String timestamp, String positionName, String companyValue, String link)
+            throws IOException {
+
+        // create empty string variables for the detailed information
+        String education, languages, salary, typeOfEmployment, homeOfficeValue;
+
+        education = languages = salary = typeOfEmployment = homeOfficeValue = "";
+
+        // wait for the page to load
+        waitForVisibilityOfElement(driver, detailInfoElement);
+
+        // make sure the element exists before taking the info out of it
+        if (doesElementExist(DETAIL_INFO_CSS)) {
+
+            education = getInformationText(DETAIL_EDUCATION_XPATH);
+            languages = getInformationText(DETAIL_LANGUAGE_XPATH);
+            salary = getInformationText(DETAIL_SALARY_XPATH);
+            typeOfEmployment = getInformationText(DETAIL_TYPE_OF_EMPLOYMENT_XPATH);
+            homeOfficeValue = getInformationText(DETAIL_HOMEOFFICE_XPATH);
+
+            // write values to Excel
+            ExcelWriter_detail(timestamp, positionName, companyValue, link, salary, homeOfficeValue, education,
+                    languages, salary, typeOfEmployment);
+            // String timestamp, String positionName, String company, String link, String salary,
+            // String workFromHome, String education, String languages, String detailSalary,
+            // String typeOfEmployment
+            System.out.println("Detail info: " + positionName);
+        } else {
+            // if the element not present, save only basic info
+            ExcelWriter_basic(timestamp, positionName, companyValue, link, salary);
+            System.out.println("Basic info: " + positionName);
+        }
+    }
+
+    private String getInformationText(String informationName) {
+
+        // create variables
+        String xpath = "." + informationName;
+        String fullText = "";
+
+        // if the required information element exist
+        if (detailInfoElement.findElements(By.xpath(xpath)).size() > 0) {
+
+            // save it's value to the variable
+            fullText = detailInfoElement.findElement(By.xpath(xpath)).getText();
+        }
+
+        // return fullText
+        return fullText;
+    }
 
     private void waitForVisibilityOfElement(WebDriver driver, WebElement webElement) {
         new WebDriverWait(driver, TIMEOUT_IN_SECS)
@@ -266,12 +325,32 @@ public class DatacruitPage {
         return parentElement.getAttribute("href");
     }
 
+    private boolean doesElementExist(String css) {
+        return driver.findElements(By.cssSelector(css)).size() > 0;
+    }
+
     private void ExcelWriter_basic(String timestamp, String positionName, String company,
                                    String link, String salary) throws IOException {
 
         //Create an array with the data in the same order in which you expect to be filled in excel file
         String[] valueToWrite = {timestamp, DatacruitPage.WEBSITE_NAME, positionName, company, link, salary, "",
                 "NO", "", "", "", "", "", "", "", "", ""};
+
+        //Create an object of current class
+        ExcelEditor objExcelFile = new ExcelEditor();
+
+        //Write the file using file name, sheet name and the data to be filled
+        objExcelFile.WriteToExcel(System.getProperty("user.dir") + "\\src\\test\\resources",
+                base.TestBase.FILE_NAME, DatacruitPage.SHEETNAME, valueToWrite);
+    }
+
+    private void ExcelWriter_detail(String timestamp, String positionName, String company, String link, String salary,
+                                    String workFromHome, String education, String languages, String detailSalary,
+                                    String typeOfEmployment) throws IOException {
+
+        //Create an array with the data in the same order in which you expect to be filled in excel file
+        String[] valueToWrite = {timestamp, DatacruitPage.WEBSITE_NAME, positionName, company, link, salary, workFromHome,
+                "YES", "", "", education, languages, detailSalary, "", typeOfEmployment, "", ""};
 
         //Create an object of current class
         ExcelEditor objExcelFile = new ExcelEditor();
