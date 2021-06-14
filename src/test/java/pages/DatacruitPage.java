@@ -1,6 +1,7 @@
 package pages;
 
 import base.WebDriverSingleton;
+import helpers.ExcelEditor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -116,13 +117,9 @@ public class DatacruitPage {
         // click on dropdown
         typeOfWorkInput.click();
 
-//        waitForVisibilityOfElement(driver, typeOfWorkResult);
-
         // select "Živnostenský list"
         typeOfWorkResult.findElement(By.xpath("." + "//*[contains(@id,'contractor')]")).click();
 
-//        waitForElementToBeClickable(driver, searchButton);
-//        waitUntilPageLoaded(driver);
     }
 
     public void clickSearchButton() {
@@ -146,7 +143,6 @@ public class DatacruitPage {
             // send positions size to the function
             // go through the list of positions and save them to excel
             getPositionsAndSaveThemToExcel(positions_size);
-//            System.out.println(i + ": " + positions_size);
 
             // if the code reaches the last page or the set limit, break the cycle
             if (getBreakCondition(i)) break;
@@ -193,17 +189,17 @@ public class DatacruitPage {
             String positionName = getElementText(position, POSITION_NAME_XPATH);
             String company = getElementText(position, POSITION_COMPANY_XPATH);
             String linkAddress = getLinkUrl(position);
-//            String salaryValue = getLabelValue(position, SALARY_LABEL_XPATH);
             String salaryValue = getElementText(position, POSITION_SALARY_XPATH);
-//            String homeOfficeValue = getLabelValue(position, HOMEOFFICE_LABEL_XPATH);
 
-            System.out.println(timestamp);
-            System.out.println("Position: " + positionName);
-            System.out.println("Company: " + company);
-            System.out.println("Link: " + linkAddress);
-            System.out.println("Salary: " + salaryValue);
-//            System.out.println(homeOfficeValue);
-            System.out.println("----------------------------------------------------------");
+//            System.out.println(timestamp);
+//            System.out.println("Position: " + positionName);
+//            System.out.println("Company: " + company);
+//            System.out.println("Link: " + linkAddress);
+//            System.out.println("Salary: " + salaryValue);
+//            System.out.println("----------------------------------------------------------");
+
+            ExcelWriter_basic(timestamp, positionName, company, linkAddress, salaryValue);
+            System.out.println("Basic info: " + positionName);
 
             // open new tab and create ArrayList with windowHandles
             ((JavascriptExecutor) driver).executeScript("window.open()");
@@ -261,26 +257,6 @@ public class DatacruitPage {
         wait.until(ExpectedConditions.
                 numberOfElementsToBe(By.xpath("//div[@style='position: absolute; left: 0px; top: 2615px; width: 100%; height: 1px; margin-top: -1px;']"),
                         0));
-//        try {
-////            // body nittro-transition-auto nittro-transition-bar - this is loaded
-////            System.out.println("it waited 1");
-////        } catch (Exception e) {
-////            System.out.println("it didnt wait 1");
-////        }
-////
-////        try {
-////            // body nittro-transition-auto nittro-transition-bar nittro-transition-middle - this is loading
-////            System.out.println("it waited 2");
-////        } catch (Exception e) {
-////            System.out.println("it didnt wait 2");
-////        }
-////
-////        try {
-////            // //div[@style='position: absolute; left: 0px; top: 2615px; width: 100%; height: 1px; margin-top: -1px;']
-////            System.out.println("it waited 3");
-////        } catch (Exception e) {
-////            System.out.println("it didnt wait 3");
-////        }
     }
 
     private void waitUntilSomething() {
@@ -334,6 +310,21 @@ public class DatacruitPage {
 
     private String getLinkUrl(WebElement parentElement) {
         return parentElement.getAttribute("href");
+    }
+
+    private void ExcelWriter_basic(String timestamp, String positionName, String company,
+                                   String link, String salary) throws IOException {
+
+        //Create an array with the data in the same order in which you expect to be filled in excel file
+        String[] valueToWrite = {timestamp, DatacruitPage.WEBSITE_NAME, positionName, company, link, salary, "",
+                "NO", "", "", "", "", "", "", "", "", ""};
+
+        //Create an object of current class
+        ExcelEditor objExcelFile = new ExcelEditor();
+
+        //Write the file using file name, sheet name and the data to be filled
+        objExcelFile.WriteToExcel(System.getProperty("user.dir") + "\\src\\test\\resources",
+                base.TestBase.FILE_NAME, DatacruitPage.SHEETNAME, valueToWrite);
     }
 
     public void recheckAllInputs() {
