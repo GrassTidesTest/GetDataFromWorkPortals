@@ -14,7 +14,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 public class DatacruitPage {
     private final WebDriver driver;
@@ -43,20 +42,13 @@ public class DatacruitPage {
     private static final String POSITION_NAME_XPATH = "//h2";
     private static final String POSITION_COMPANY_XPATH = "/ul/li[1]";
     private static final String POSITION_SALARY_XPATH = "/ul/li[3]";
-    //    private static final String POSITION_LINK_XPATH = "//h3/a";
     private static final String POSITION_LINK_CSS = "a.jobCard";
     private static final String POSITIONS_XPATH = "//*[@id='snippet--list']/a";
-
 
     // Position detail page constants
 //    private static final String DETAIL_INFO_XPATH = "//div[h3[text()='Informace o pozici']]/dl";
 //    private static final String CONTACT_NAME_XPATH = "//span[@itemprop='name']/a";
 //    private static final String CONTACT_INFO_XPATH = "//span[@itemprop='telephone']";
-
-    // file management variables
-//    private static final String FILE_TS_PATTERN = "ddMMyy";
-//    private static final String FILE_PREFIX = "data";
-//    private static final String FILE_PORTAL = "jobscz";
 
     // Search form
     @FindBy(css = ".treeSelect__preview-search input")
@@ -208,27 +200,7 @@ public class DatacruitPage {
             // open the current position in new tab
             // by doing this we avoid getting stuck by some aggressive popups when closing the position page
             openLinkInTab(linkAddress, currentTabs);
-//
-//            // get position level and decide what to do with the position
-//            switch (getPositionLevel(linkAddress)) {
-//                case BASIC:
-//                case MEDIUM:
-//                    // get the detailed information from the page for BASIC and MEDIUM
-//                    // print what info from which position you save
-//                    System.out.println("Detail info: " + positionName);
-//                    getDetailedInformation(timestamp, positionName, company, linkAddress, homeOfficeValue);
-//                    break;
-//                case ADVANCED:
-//                    // otherwise save basic info to the excel, reading it from different layouts is not an option here
-//                    // print what info from which position you save
-//                    System.out.println("Basic info: " + positionName);
-//                    ExcelWriter(timestamp, positionName, company, linkAddress, salaryValue, homeOfficeValue);
-//                    break;
-//                case CLOSED:
-//                    // position is closed and there is nothing we can do
-//                    System.out.println("Closed: " + positionName);
-//            }
-//
+
             //close the current tab with the position and focus back on the position list page
             closeTabWithPosition(currentTabs);
         }
@@ -257,15 +229,6 @@ public class DatacruitPage {
         wait.until(ExpectedConditions.
                 numberOfElementsToBe(By.xpath("//div[@style='position: absolute; left: 0px; top: 2615px; width: 100%; height: 1px; margin-top: -1px;']"),
                         0));
-    }
-
-    private void waitUntilSomething() {
-        WebDriverWait wait = new WebDriverWait(driver, TIMEOUT_IN_SECS);
-
-        WebElement blaElement = driver.findElement(By.xpath("//*[@class='d-print-none']"));
-
-        wait.until(ExpectedConditions.visibilityOf(blaElement));
-        wait.until(ExpectedConditions.invisibilityOf(blaElement));
     }
 
     private String getTimeStamp(String pattern) {
@@ -297,15 +260,6 @@ public class DatacruitPage {
 
         // change back to main windows
         driver.switchTo().window(tabs.get(0));
-    }
-
-    private String cropPositionLink(WebElement parentElement, String xpath) {
-        // get the href value from the element
-        String originalString = parentElement.findElement(By.xpath("." + xpath)).getAttribute("href");
-
-        // crop the link so that the part after ? including is not present
-        // link must contain ? otherwise it fails
-        return originalString.substring(0, originalString.indexOf("?"));
     }
 
     private String getLinkUrl(WebElement parentElement) {
